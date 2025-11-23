@@ -16,7 +16,7 @@ const validationSchema = Yup.object().shape({
 const LoginPage = () => {
   const handleSubmit = (values, {setSubmitting}) => {
     console.log("Данные формы:", values);
-    setSubmitting(true);
+    setSubmitting(false);
   };
 
   return (
