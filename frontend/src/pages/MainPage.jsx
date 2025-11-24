@@ -1,14 +1,25 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { logout } from '../services/authService';
 
 const MainPage = () => {
-  return (
-    <div className="main-page">
-      <h1>Чат</h1>
-      <p>Чат для общения с другими пользователями</p>
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
-      <nav>
-        <Link to="/login">Вход</Link>
-      </nav>
+  return (
+    <div className="chat-page">
+      <header className="chat-header">
+        <h1>Добро пожаловать в чат</h1>
+        <button onClick={handleLogout} className="logout-button">
+          Выйти
+        </button>
+      </header>
+
+      <main className="chat-content">
+        <p>Здесь будет чат-приложение</p>
+      </main>
     </div>
   );
 };

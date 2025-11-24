@@ -1,6 +1,8 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { login } from "../services/authService";
 import './LoginPage.css';
 
 const validationSchema = Yup.object().shape({
@@ -13,17 +15,27 @@ const validationSchema = Yup.object().shape({
     .required("Пароль обязателен"),
 });
 
-const LoginPage = () => {
-  const handleSubmit = (values, {setSubmitting}) => {
-    console.log("Данные формы:", values);
-    setSubmitting(false);
+function LoginPage() {
+  const navigate = useNavigate();
+  const [serverError, setServerError] = useState(null);
+
+  const handleSubmit = async (values, {setSubmitting}) => {
+    setServerError(null);
+    try {
+      await login(values.username, values.password);
+      navigate("/");
+    } catch (error) {
+      setServerError(error.message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <div className="login-page">
       <div className="login-container">
         <h1>Вход</h1>
-        
+        {serverError && <div className="alert alert-error">{serverError}</div>}
         <Formik
           initialValues={{ 
             username: "", 
@@ -32,7 +44,7 @@ const LoginPage = () => {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ isSubmitting }) => (
+          {({ isSubmitting, errors, touched }) => (
             <Form className="login-form">
               <div className="form-group">
                 <label htmlFor="username">Имя пользователя</label>
@@ -41,7 +53,9 @@ const LoginPage = () => {
                   name="username"
                   id="username"
                   placeholder="Введите имя пользователя"
-                  className="form-input"
+                  className={`form-input ${
+                    errors.username && touched.username ? 'input-error' : ''
+                  }`}
                 />
                 <ErrorMessage name="username" component="div" className="error-message"/>
               </div>
@@ -52,7 +66,9 @@ const LoginPage = () => {
                   name="password"
                   id="password"
                   placeholder="Введите пароль"
-                  className="form-input"
+                  className={`form-input ${
+                    errors.password && touched.password ? 'input-error' : ''
+                  }`}
                 />
                 <ErrorMessage name="password" component="div" className="error-message"/>
               </div>
@@ -66,6 +82,13 @@ const LoginPage = () => {
             </Form>
           )}
         </Formik>
+
+        <div className="login-hint">
+          <p>Для тестирования используйте:</p>
+          <p>Логин: <strong>admin</strong></p>
+          <p>Пароль: <strong>admins</strong></p>
+        </div>
+
         <nav className="login-nav">
           <Link to="/">Вернуться в чат</Link>
         </nav>
