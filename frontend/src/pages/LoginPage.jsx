@@ -11,6 +11,7 @@ const validationSchema = Yup.object().shape({
     .max(20, "Имя должно содержать максимум 20 символов")
     .required("Имя пользователя обязательно"),
   password: Yup.string()
+    .min(5, "Пароль должен содержать минимум 5 символов")
     .required("Пароль обязателен"),
 });
 
