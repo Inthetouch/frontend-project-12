@@ -4,8 +4,8 @@ import { fetchChatData, addMessage as apiAddMessage } from '../services/chatServ
 
 export const initializeChat = createAsyncThunk('chat/initializeChat', async (_, { rejectWithValue }) => {
   try {
-    const response = await fetchChatData();
-    return response.data;
+    const data = await fetchChatData();
+    return data;
   } catch (error) {
     return rejectWithValue(error.message);
   }
@@ -72,7 +72,6 @@ const chatSlice = createSlice({
       });
     builder
       .addCase(sendMessage.pending, (state) => {
-        state.loading = true;
         state.error = null;
       })
       .addCase(sendMessage.fulfilled, (state, action) => {
@@ -85,7 +84,6 @@ const chatSlice = createSlice({
       })
       .addCase(sendMessage.rejected, (state, action) => {
         state.error = action.payload;
-        state.loading = false;
       });
   },
 });

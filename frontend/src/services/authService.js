@@ -12,6 +12,7 @@ export const login = async (username, password) => {
     const { token } = response.data;
     if (token) {
       localStorage.setItem("token", token);
+      localStorage.setItem("username", username);
     }
     return token;
 
@@ -31,6 +32,7 @@ export const isAuthenticated = () => {
 
 export const logout = () => {
   localStorage.removeItem("token");
+  localStorage.removeItem("username");
 };
 
 export const setupAxiosInterceptors = () => {
@@ -38,6 +40,7 @@ export const setupAxiosInterceptors = () => {
     (config) => {
       const token = getToken();
       if (token) {
+        config.headers = config.headers || {};
         config.headers.Authorization = `Bearer ${token}`;
       }
       return config;

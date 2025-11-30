@@ -1,11 +1,18 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'api/v1';
+const API_BASE_URL = '/api/v1';
 
 export const fetchChatData = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/channels`);
-    return response.data;
+    const [channelsResponse, messagesResponse] = await Promise.all([
+      axios.get(`${API_BASE_URL}/channels`),
+      axios.get(`${API_BASE_URL}/messages`)
+    ]);
+    
+    return {
+      channels: channelsResponse.data,
+      messages: messagesResponse.data
+    };
   } catch (error) {
     const message = error.response?.data?.message || 'Ошибка загрузки данных';
     throw new Error(message);
@@ -24,7 +31,7 @@ export const addChannel = async (name) => {
 
 export const addMessage = async (channelId, body, username) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/channels/${channelId}/messages`, { body, username });
+    const response = await axios.post(`${API_BASE_URL}/messages`, { body, channelId, username });
     return response.data;
   } catch (error) {
     const message = error.response?.data?.message || 'Ошибка отправки сообщения';

@@ -11,7 +11,6 @@ const validationSchema = Yup.object().shape({
     .max(20, "Имя должно содержать максимум 20 символов")
     .required("Имя пользователя обязательно"),
   password: Yup.string()
-    .min(6, "Пароль должен содержать минимум 6 символов")
     .required("Пароль обязателен"),
 });
 
@@ -86,7 +85,7 @@ function LoginPage() {
         <div className="login-hint">
           <p>Для тестирования используйте:</p>
           <p>Логин: <strong>admin</strong></p>
-          <p>Пароль: <strong>admins</strong></p>
+          <p>Пароль: <strong>admin</strong></p>
         </div>
 
         <nav className="login-nav">
