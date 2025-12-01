@@ -40,6 +40,26 @@ const chatSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+
+    addMessageFromSocket: (state, action) => {
+      const { channelId, message } = action.payload;
+      if (!state.messages[channelId]) {
+        state.messages[channelId] = [];
+      }
+      state.messages[channelId].push(message);
+    },
+
+    setSocketConnected: (state, action) => {
+      state.socketConnected = action.payload;
+    },
+
+    setIsSending: (state, action) => {
+      state.isSending = action.payload;
+    },
+
+    setError: (state, action) => {
+      state.error = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -63,7 +83,8 @@ const chatSlice = createSlice({
         }
 
         if (state.channels.length > 0 && !state.currentChannelId) {
-          state.currentChannelId = state.channels[0].id;
+          const generalChannel = state.channels.find((channel) => channel.name.toLowerCase() === 'general');
+          state.currentChannelId = generalChannel?.id || state.channels[0].id;
         }
       })
       .addCase(initializeChat.rejected, (state, action) => {
@@ -72,9 +93,10 @@ const chatSlice = createSlice({
       });
     builder
       .addCase(sendMessage.pending, (state) => {
-        state.error = null;
+        state.isSending = true;
       })
       .addCase(sendMessage.fulfilled, (state, action) => {
+        state.isSending = false;
         const { channelId, message } = action.payload;
         if (!state.messages[channelId]) {
           state.messages[channelId] = [];
@@ -88,5 +110,5 @@ const chatSlice = createSlice({
   },
 });
 
-export const { setCurrentChannel, clearError } = chatSlice.actions;
+export const { setCurrentChannel, clearError, addMessageFromSocket, setSocketConnected, setIsSending, setError } = chatSlice.actions;
 export default chatSlice.reducer;
