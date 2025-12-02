@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
 
 function MessageList() {
   const { messages, currentChannelId } = useSelector((state) => state.chat);
@@ -8,24 +8,38 @@ function MessageList() {
   const currentMessages = messages[currentChannelId] || [];
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [currentMessages]);
-  
+
+  const formatTime = (timestamp) => {
+    if (!timestamp) return '';
+    
+    try {
+      return new Date(timestamp).toLocaleTimeString('ru-RU', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch {
+      return '';
+    }
+  };
+
   return (
     <div className="message-list">
-      <div className="message-list__items">
+      <div className="message-list__messages">
         {currentMessages.length === 0 ? (
           <p className="message-list__empty">Нет сообщений. Начните беседу!</p>
         ) : (
           currentMessages.map((message) => (
             <div key={message.id} className="message">
-              <span className="message__username">{message.username}:</span>
+              <div className="message__header">
+                <span className="message__username">{message.username}</span>
+                {message.timestamp && (
+                  <span className="message__time">{formatTime(message.timestamp)}</span>
+                )}
+              </div>
               <p className="message__body">{message.body}</p>
-              {message.timestamp && (<span className="message__time">
-                {new Date(message.timestamp).toLocaleTimeString('ru-RU')}
-              </span>
-              )}
-          </div>
+            </div>
           ))
         )}
         <div ref={messagesEndRef} />

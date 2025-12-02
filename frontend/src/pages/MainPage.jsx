@@ -44,7 +44,7 @@ const MainPage = () => {
       const socket = getSocket();
 
       const handleNewMessage = (message) => {
-        dispatch(addMessageFromSocket({ channelId: currentChannelId, message }));
+        dispatch(addMessageFromSocket({ channelId: currentChannelId, message, }));
       };
 
       const handleError = (errorMessage) => {
@@ -65,6 +65,7 @@ const MainPage = () => {
   }, [dispatch, currentChannelId]);
 
   const handleLogout = () => {
+    disconnectSocket();
     logout();
     navigate('/login');
   };

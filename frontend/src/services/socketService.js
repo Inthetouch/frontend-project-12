@@ -1,12 +1,13 @@
-import io from "socket.io-client";
-import { getToken } from "./authService";
+import io from 'socket.io-client';
+import { getToken } from './authService';
 
-let socket = null;  
+let socket = null;
 export const initializeSocket = () => {
   return new Promise((resolve, reject) => {
     try {
       const token = getToken();
-      socket = io("http://localhost:5001", {
+
+      socket = io('http://localhost:5001', {
         auth: {
           token,
         },
@@ -16,14 +17,18 @@ export const initializeSocket = () => {
         reconnectionAttempts: 5,
       });
 
-      socket.on("connect", () => {
-        console.log("Socket connected:", socket.id);
-        resolve(socket);
+      socket.on('connect', () => {
+        console.log('Socket connected:', socket.id);
+        resolve();
       });
 
-      socket.on("connect_error", (error) => { 
-        console.error("Socket connection error:", error);
+      socket.on('connect_error', (error) => {
+        console.error('Socket connection error:', error);
         reject(error);
+      });
+
+      socket.on('disconnect', (reason) => {
+        console.warn('Socket disconnected:', reason);
       });
     } catch (error) {
       reject(error);
@@ -33,36 +38,35 @@ export const initializeSocket = () => {
 
 export const getSocket = () => {
   if (!socket) {
-    throw new Error("Socket not initialized. Call initializeSocket first.");
+    throw new Error('Socket not initialized');
   }
   return socket;
-}; 
+};
 
 export const disconnectSocket = () => {
   if (socket) {
     socket.disconnect();
     socket = null;
-    console.log("Socket disconnected");
   }
 };
 
 export const onNewMessage = (channelId, callback) => {
-  if (!socket) {
-    return;
-  }
-  socket.on(`message:${channelId}`, callback);
+  if (!socket) return;
+
+  socket.on(`newMessage:${channelId}`, callback);
 };
 
 export const offNewMessage = (channelId, callback) => {
-  if (!socket) {
-    return;
-  }
-  socket.off(`message:${channelId}`, callback);
+  if (!socket) return;
+  socket.off(`newMessage:${channelId}`, callback);
+};
+
+export const onError = (callback) => {
+  if (!socket) return;
+  socket.on('error', callback);
 };
 
 export const offError = (callback) => {
-  if (!socket) {
-    return;
-  }
-  socket.off("error", callback);
+  if (!socket) return;
+  socket.off('error', callback);
 };

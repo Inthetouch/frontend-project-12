@@ -1,32 +1,38 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { fetchChatData, addMessage as apiAddMessage } from '../services/chatService';
 
-
-export const initializeChat = createAsyncThunk('chat/initializeChat', async (_, { rejectWithValue }) => {
-  try {
-    const data = await fetchChatData();
-    return data;
-  } catch (error) {
-    return rejectWithValue(error.message);
+export const initializeChat = createAsyncThunk(
+  'chat/initializeChat',
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await fetchChatData();
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
   }
-});
+);
 
-export const sendMessage = createAsyncThunk('chat/sendMessage', 
-  async ({channelId, body, username}, { rejectWithValue }) => {
-  try {
-    const message = await apiAddMessage(channelId, body, username);
-    return { channelId, message }
-  } catch (error) {
-    return rejectWithValue(error.message);
+export const sendMessage = createAsyncThunk(
+  'chat/sendMessage',
+  async ({ channelId, body, username }, { rejectWithValue }) => {
+    try {
+      const message = await apiAddMessage(channelId, body, username);
+      return { channelId, message };
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
   }
-});
+);
 
 const initialState = {
   channels: [],
   messages: {},
-  currentChannel: null,
+  currentChannelId: null,
   loading: false,
   error: null,
+  socketConnected: false,
+  isSending: false,
 };
 
 const chatSlice = createSlice({
@@ -36,7 +42,7 @@ const chatSlice = createSlice({
     setCurrentChannel: (state, action) => {
       state.currentChannelId = action.payload;
     },
-    
+
     clearError: (state) => {
       state.error = null;
     },
@@ -83,14 +89,17 @@ const chatSlice = createSlice({
         }
 
         if (state.channels.length > 0 && !state.currentChannelId) {
-          const generalChannel = state.channels.find((channel) => channel.name.toLowerCase() === 'general');
+          const generalChannel = state.channels.find(
+            (ch) => ch.name.toLowerCase() === 'general'
+          );
           state.currentChannelId = generalChannel?.id || state.channels[0].id;
         }
       })
       .addCase(initializeChat.rejected, (state, action) => {
-        state.error = action.payload;
         state.loading = false;
+        state.error = action.payload;
       });
+
     builder
       .addCase(sendMessage.pending, (state) => {
         state.isSending = true;
@@ -105,6 +114,7 @@ const chatSlice = createSlice({
         state.error = null;
       })
       .addCase(sendMessage.rejected, (state, action) => {
+        state.isSending = false;
         state.error = action.payload;
       });
   },
