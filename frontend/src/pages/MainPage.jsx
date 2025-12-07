@@ -20,6 +20,8 @@ const MainPage = () => {
   }, [dispatch]);
 
   useEffect(() => {
+    const handlers = handlersRef.current;
+
     const setupSocket = async () => {
       try {
         await initializeSocket();
@@ -36,8 +38,8 @@ const MainPage = () => {
           dispatch(setError(errorMessage));
         };
         
-        handlersRef.current.handleNewMessage = handleNewMessage;
-        handlersRef.current.handleError = handleError;
+        handlers.handleNewMessage = handleNewMessage;
+        handlers.handleError = handleError;
 
         onNewMessage(handleNewMessage);
         onError(handleError);
@@ -56,12 +58,12 @@ const MainPage = () => {
     setupSocket();
 
     return () => {
-      if (handlersRef.current.handleNewMessage) {
-        offNewMessage(handlersRef.current.handleNewMessage);
+      if (handlers.handleNewMessage) {
+        offNewMessage(handlers.handleNewMessage);
       }
 
-      if (handlersRef.current.handleError) {
-        offError(handlersRef.current.handleError);
+      if (handlers.handleError) {
+        offError(handlers.handleError);
       }
       
       disconnectSocket();

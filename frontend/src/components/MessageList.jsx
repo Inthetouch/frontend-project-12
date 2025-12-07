@@ -1,11 +1,14 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 
 function MessageList() {
   const { messages, currentChannelId } = useSelector((state) => state.chat);
   const messagesEndRef = useRef(null);
 
-  const currentMessages = messages[currentChannelId] || [];
+  const currentMessages = useMemo(
+    () => messages[currentChannelId] || [],
+    [messages, currentChannelId]
+  );
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
