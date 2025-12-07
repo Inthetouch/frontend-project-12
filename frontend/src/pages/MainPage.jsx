@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { initializeChat, addMessageFromSocket, setSocketConnected, setError } from '../store/chatSlice';
 import { logout } from '../services/authService';
-import { initializeSocket, getSocket, disconnectSocket, onNewMessage, offNewMessage, onError, offError } from '../services/socketService';
+import { initializeSocket, disconnectSocket, onNewMessage, offNewMessage, onError, offError } from '../services/socketService';
 import ChannelList from '../components/ChannelList';
 import MessageList from '../components/MessageList';
 import MessageForm from '../components/MessageForm';
@@ -11,7 +11,9 @@ import MessageForm from '../components/MessageForm';
 const MainPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error, currentChannelId, socketConnected} = useSelector((state) => state.chat);
+  const { loading, error, socketConnected} = useSelector((state) => state.chat);
+
+  const handlersRef = useRef({ handleNewMessage: null, handleError: null });
 
   useEffect(() => {
     dispatch(initializeChat());
@@ -23,8 +25,30 @@ const MainPage = () => {
         await initializeSocket();
         dispatch(setSocketConnected(true));
         console.log('WebSocket connected');
+
+        const handleNewMessage = (message) => {
+          console.log('New message received:', message);
+          dispatch(addMessageFromSocket({ channelId: message.channelId, message }));
+        };
+
+        const handleError = (errorMessage) => {
+          console.error('Socket error:', errorMessage);
+          dispatch(setError(errorMessage));
+        };
+        
+        handlersRef.current.handleNewMessage = handleNewMessage;
+        handlersRef.current.handleError = handleError;
+
+        onNewMessage(handleNewMessage);
+        onError(handleError);
+
       } catch (error) {
         console.error('WebSocket connection error:', error);
+        if (error.message?.includes('Unauthorized') || error.message?.includes('401')) {
+          logout();
+          navigate('/login');
+          return;
+        }
         dispatch(setError('Ошибка подключения к серверу'));
       }
     };
@@ -32,37 +56,18 @@ const MainPage = () => {
     setupSocket();
 
     return () => {
+      if (handlersRef.current.handleNewMessage) {
+        offNewMessage(handlersRef.current.handleNewMessage);
+      }
+
+      if (handlersRef.current.handleError) {
+        offError(handlersRef.current.handleError);
+      }
+      
       disconnectSocket();
       dispatch(setSocketConnected(false));
     }
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (!currentChannelId) return;
-
-    try {
-      const socket = getSocket();
-
-      const handleNewMessage = (message) => {
-        dispatch(addMessageFromSocket({ channelId: currentChannelId, message, }));
-      };
-
-      const handleError = (errorMessage) => {
-        console.error('Socket error:', errorMessage);
-        dispatch(setError(errorMessage));
-      };
-
-      onNewMessage(currentChannelId, handleNewMessage);
-      onError(handleError);
-
-      return () => {
-        offNewMessage(currentChannelId, handleNewMessage);
-        offError(handleError);
-      };
-    } catch (error) {
-      console.error('Socket error:', error);
-    }
-  }, [dispatch, currentChannelId]);
+  }, [dispatch, navigate]);
 
   const handleLogout = () => {
     disconnectSocket();

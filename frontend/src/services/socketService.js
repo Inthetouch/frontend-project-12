@@ -2,13 +2,21 @@ import io from 'socket.io-client';
 import { getToken } from './authService';
 
 let socket = null;
+
 export const initializeSocket = () => {
   return new Promise((resolve, reject) => {
     try {
       const token = getToken();
 
-      socket = io('http://localhost:5001', {
-        auth: {
+      console.log('Token from localStorage:', token);
+
+      if (!token) {
+        reject(new Error('No token available'));
+        return;
+      }
+
+      socket = io({
+        auth: { 
           token,
         },
         reconnection: true,
@@ -50,15 +58,15 @@ export const disconnectSocket = () => {
   }
 };
 
-export const onNewMessage = (channelId, callback) => {
+export const onNewMessage = (callback) => {
   if (!socket) return;
 
-  socket.on(`newMessage:${channelId}`, callback);
+  socket.on('newMessage', callback);
 };
 
-export const offNewMessage = (channelId, callback) => {
+export const offNewMessage = (callback) => {
   if (!socket) return;
-  socket.off(`newMessage:${channelId}`, callback);
+  socket.off('newMessage', callback);
 };
 
 export const onError = (callback) => {

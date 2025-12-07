@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const API_BASE_URL = "/api/v1";
+let interceptorsSetup = false;
 
 export const login = async (username, password) => {
   try {
@@ -35,7 +36,10 @@ export const logout = () => {
   localStorage.removeItem("username");
 };
 
-export const setupAxiosInterceptors = () => {
+export const setupAxiosInterceptors = (onUnauthorized) => {
+  if (interceptorsSetup) return;
+  interceptorsSetup = true;
+  
   axios.interceptors.request.use(
     (config) => {
       const token = getToken();
@@ -46,5 +50,20 @@ export const setupAxiosInterceptors = () => {
       return config;
     },
     (error) => Promise.reject(error)
+  );
+
+  axios.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (error.response?.status === 401) {
+        logout();
+        if (onUnauthorized) {
+          onUnauthorized();
+        } else {
+          window.location.href = '/login';
+        }
+      }
+      return Promise.reject(error);
+    }
   );
 };

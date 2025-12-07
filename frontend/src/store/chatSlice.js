@@ -52,7 +52,10 @@ const chatSlice = createSlice({
       if (!state.messages[channelId]) {
         state.messages[channelId] = [];
       }
-      state.messages[channelId].push(message);
+      const exists = state.messages[channelId].some((msg) => msg.id === message.id);
+      if (!exists) {
+        state.messages[channelId].push(message);
+      }
     },
 
     setSocketConnected: (state, action) => {
@@ -104,13 +107,8 @@ const chatSlice = createSlice({
       .addCase(sendMessage.pending, (state) => {
         state.isSending = true;
       })
-      .addCase(sendMessage.fulfilled, (state, action) => {
+      .addCase(sendMessage.fulfilled, (state) => {
         state.isSending = false;
-        const { channelId, message } = action.payload;
-        if (!state.messages[channelId]) {
-          state.messages[channelId] = [];
-        }
-        state.messages[channelId].push(message);
         state.error = null;
       })
       .addCase(sendMessage.rejected, (state, action) => {
