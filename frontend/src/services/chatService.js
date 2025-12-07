@@ -6,35 +6,63 @@ export const fetchChatData = async () => {
   try {
     const [channelsResponse, messagesResponse] = await Promise.all([
       axios.get(`${API_BASE_URL}/channels`),
-      axios.get(`${API_BASE_URL}/messages`)
+      axios.get(`${API_BASE_URL}/messages`),
     ]);
     
     return {
       channels: channelsResponse.data,
-      messages: messagesResponse.data
+      messages: messagesResponse.data,
     };
   } catch (error) {
     const message = error.response?.data?.message || 'Ошибка загрузки данных';
     throw new Error(message);
   }
-}
+};
+
+export const addMessage = async (channelId, body, username) => {
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/channels/${channelId}/messages`,
+      { body, username }
+    );
+    return response.data;
+  } catch (error) {
+    const message = error.response?.data?.message || 'Ошибка отправки сообщения';
+    throw new Error(message);
+  }
+};
 
 export const addChannel = async (name) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/channels`, { name });
     return response.data;
   } catch (error) {
-    const message = error.response?.data?.message || 'Ошибка добавления канала';
+    const message =
+      error.response?.data?.message || 'Ошибка создания канала';
     throw new Error(message);
   }
-}
+};
 
-export const addMessage = async (channelId, body, username) => {
+export const deleteChannel = async (channelId) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/messages`, { body, channelId, username });
+    await axios.delete(`${API_BASE_URL}/channels/${channelId}`);
+  } catch (error) {
+    const message =
+      error.response?.data?.message || 'Ошибка удаления канала';
+    throw new Error(message);
+  }
+};
+
+export const renameChannel = async (channelId, name) => {
+  try {
+    const response = await axios.patch(
+      `${API_BASE_URL}/channels/${channelId}`,
+      { name }
+    );
     return response.data;
   } catch (error) {
-    const message = error.response?.data?.message || 'Ошибка отправки сообщения';
+    const message =
+      error.response?.data?.message || 'Ошибка переименования канала';
     throw new Error(message);
   }
-}
+};

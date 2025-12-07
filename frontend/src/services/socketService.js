@@ -8,8 +8,6 @@ export const initializeSocket = () => {
     try {
       const token = getToken();
 
-      console.log('Token from localStorage:', token);
-
       if (!token) {
         reject(new Error('No token available'));
         return;
@@ -77,4 +75,34 @@ export const onError = (callback) => {
 export const offError = (callback) => {
   if (!socket) return;
   socket.off('error', callback);
+};
+
+export const onNewChannel = (callback) => {
+  if (!socket) return;
+  socket.on('newChannel', callback);
+};
+
+export const offNewChannel = (callback) => {
+  if (!socket) return;
+  socket.off('newChannel', callback);
+};
+
+export const onRenameChannel = (callback) => {
+  if (!socket) return;
+  socket.on('renameChannel', callback);
+};
+
+export const offRenameChannel = (callback) => {
+  if (!socket) return;
+  socket.off('renameChannel', callback);
+};
+
+export const onRemoveChannel = (callback) => {
+  if (!socket) return;
+  socket.on('removeChannel', callback);
+};
+
+export const offRemoveChannel = (callback) => {
+  if (!socket) return;
+  socket.off('removeChannel', callback);
 };

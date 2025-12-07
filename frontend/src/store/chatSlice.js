@@ -1,5 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { fetchChatData, addMessage as apiAddMessage } from '../services/chatService';
+import { 
+  fetchChatData, addMessage as apiAddMessage,
+  addChannel as apiAddChannel,
+  deleteChannel as apiDeleteChannel,
+  renameChannel as apiRenameChannel,
+} from '../services/chatService';
 
 export const initializeChat = createAsyncThunk(
   'chat/initializeChat',
@@ -19,6 +24,42 @@ export const sendMessage = createAsyncThunk(
     try {
       const message = await apiAddMessage(channelId, body, username);
       return { channelId, message };
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const createChannel = createAsyncThunk(
+  'chat/createChannel',
+  async ({ name }, { rejectWithValue }) => {
+    try {
+      const channel = await apiAddChannel(name);
+      return channel;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const deleteChannel = createAsyncThunk(
+  'chat/deleteChannel',
+  async ({ channelId }, { rejectWithValue }) => {
+    try {
+      await apiDeleteChannel(channelId);
+      return channelId;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const renameChannel = createAsyncThunk(
+  'chat/renameChannel',
+  async ({ channelId, name }, { rejectWithValue }) => {
+    try {
+      const channel = await apiRenameChannel(channelId, name);
+      return channel;
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -69,7 +110,42 @@ const chatSlice = createSlice({
     setError: (state, action) => {
       state.error = action.payload;
     },
+    
+    removeChannelMessages: (state, action) => {
+      const channelId = action.payload;
+      delete state.messages[channelId];
+    },
+
+    addChannelFromSocket: (state, action) => {
+      const channel = action.payload;
+      const exists = state.channels.some((ch) => ch.id === channel.id);
+      if (!exists) {
+        state.channels.push(channel);
+      }
+    },
+
+    updateChannelFromSocket: (state, action) => {
+      const updatedChannel = action.payload;
+      const index = state.channels.findIndex((ch) => ch.id === updatedChannel.id);
+      if (index !== -1) {
+        state.channels[index] = updatedChannel;
+      }
+    },
+
+    removeChannelFromSocket: (state, action) => {
+      const { id } = action.payload;
+      state.channels = state.channels.filter((ch) => ch.id !== id);
+      delete state.messages[id];
+
+      if (state.currentChannelId === id) {
+        const generalChannel = state.channels.find(
+          (ch) => ch.name?.toLowerCase() === 'general'
+        );
+        state.currentChannelId = generalChannel?.id || state.channels[0]?.id || null;
+      }
+    },
   },
+
   extraReducers: (builder) => {
     builder
       .addCase(initializeChat.pending, (state) => {
@@ -115,8 +191,74 @@ const chatSlice = createSlice({
         state.isSending = false;
         state.error = action.payload;
       });
+
+      builder
+      .addCase(createChannel.pending, (state) => {
+        state.isLoadingChannels = true;
+      })
+      .addCase(createChannel.fulfilled, (state, action) => {
+        state.isLoadingChannels = false;
+        const newChannel = action.payload;
+        state.channels.push(newChannel);
+        state.messages[newChannel.id] = [];
+        state.currentChannelId = newChannel.id;
+        state.error = null;
+      })
+      .addCase(createChannel.rejected, (state, action) => {
+        state.isLoadingChannels = false;
+        state.error = action.payload;
+      });
+
+      builder
+      .addCase(deleteChannel.pending, (state) => {
+        state.isLoadingChannels = true;
+      })
+      .addCase(deleteChannel.fulfilled, (state, action) => {
+        state.isLoadingChannels = false;
+        const channelId = action.payload;
+        state.channels = state.channels.filter((ch) => ch.id !== channelId);
+        delete state.messages[channelId];
+
+        if (state.currentChannelId === channelId) {
+          state.currentChannelId = state.defaultChannelId;
+        }
+        state.error = null;
+      })
+      .addCase(deleteChannel.rejected, (state, action) => {
+        state.isLoadingChannels = false;
+        state.error = action.payload;
+      });
+
+      builder
+      .addCase(renameChannel.pending, (state) => {
+        state.isLoadingChannels = true;
+      })
+      .addCase(renameChannel.fulfilled, (state, action) => {
+        state.isLoadingChannels = false;
+        const updatedChannel = action.payload;
+        const index = state.channels.findIndex((ch) => ch.id === updatedChannel.id);
+        if (index !== -1) {
+          state.channels[index] = updatedChannel;
+        }
+        state.error = null;
+      })
+      .addCase(renameChannel.rejected, (state, action) => {
+        state.isLoadingChannels = false;
+        state.error = action.payload;
+      });
   },
 });
 
-export const { setCurrentChannel, clearError, addMessageFromSocket, setSocketConnected, setIsSending, setError } = chatSlice.actions;
+export const { 
+  setCurrentChannel, 
+  clearError, 
+  addMessageFromSocket, 
+  setSocketConnected, 
+  setIsSending, 
+  setError, 
+  removeChannelMessages,
+  addChannelFromSocket,
+  updateChannelFromSocket,
+  removeChannelFromSocket,
+} = chatSlice.actions;
 export default chatSlice.reducer;
