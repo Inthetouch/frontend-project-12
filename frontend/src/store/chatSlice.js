@@ -70,10 +70,12 @@ const initialState = {
   channels: [],
   messages: {},
   currentChannelId: null,
+  defaultChannelId: null,
   loading: false,
   error: null,
   socketConnected: false,
   isSending: false,
+  isLoadingChannels: false,
 };
 
 const chatSlice = createSlice({
@@ -166,18 +168,21 @@ const chatSlice = createSlice({
             state.messages[channelId].push(message);
           });
         }
+        
+        const generalChannel = state.channels.find(
+          (ch) => ch.name?.toLowerCase() === 'general'
+        );
+        state.defaultChannelId = generalChannel?.id || state.channels[0]?.id || null;
 
         if (state.channels.length > 0 && !state.currentChannelId) {
-          const generalChannel = state.channels.find(
-            (ch) => ch.name.toLowerCase() === 'general'
-          );
-          state.currentChannelId = generalChannel?.id || state.channels[0].id;
+          state.currentChannelId = state.defaultChannelId;
         }
+
       })
       .addCase(initializeChat.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
+      })
 
     builder
       .addCase(sendMessage.pending, (state) => {
@@ -199,8 +204,11 @@ const chatSlice = createSlice({
       .addCase(createChannel.fulfilled, (state, action) => {
         state.isLoadingChannels = false;
         const newChannel = action.payload;
-        state.channels.push(newChannel);
-        state.messages[newChannel.id] = [];
+        const exists = state.channels.some((ch) => ch.id === newChannel.id);
+        if (!exists) {
+          state.channels.push(newChannel);
+          state.messages[newChannel.id] = [];
+        }
         state.currentChannelId = newChannel.id;
         state.error = null;
       })

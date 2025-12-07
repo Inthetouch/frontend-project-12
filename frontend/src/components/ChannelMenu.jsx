@@ -1,5 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 
+const DEFAULT_CHANNELS = ['general', 'random'];
+
 function ChannelMenu({ channel, onRename, onDelete, isLoading }) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
@@ -20,7 +22,11 @@ function ChannelMenu({ channel, onRename, onDelete, isLoading }) {
     };
   }, [isOpen]);
 
-  const isDefault = channel?.name?.toLowerCase() === 'general';
+  if (!channel) {
+    return null;
+  }
+
+  const isDefaultChannel = DEFAULT_CHANNELS.includes(channel.name?.toLowerCase());
 
   const handleRename = () => {
     onRename();
@@ -31,6 +37,10 @@ function ChannelMenu({ channel, onRename, onDelete, isLoading }) {
     onDelete();
     setIsOpen(false);
   };
+
+  if (isDefaultChannel) {
+    return null;
+  }
 
   return (
     <div className="channel-menu" ref={menuRef}>
@@ -54,15 +64,13 @@ function ChannelMenu({ channel, onRename, onDelete, isLoading }) {
             ✎ Переименовать
           </button>
 
-          {!isDefault && (
-            <button
-              className="channel-menu__item channel-menu__item--danger"
-              onClick={handleDelete}
-              disabled={isLoading}
-            >
-              ✕ Удалить
-            </button>
-          )}
+          <button
+            className="channel-menu__item channel-menu__item--danger"
+            onClick={handleDelete}
+            disabled={isLoading}
+          >
+            ✕ Удалить
+          </button>
         </div>
       )}
     </div>
