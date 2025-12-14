@@ -10,6 +10,7 @@ function App() {
       <Routes>
         <Route path="/" element={<ProtectedRoute element={<MainPage />}/>}/>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>

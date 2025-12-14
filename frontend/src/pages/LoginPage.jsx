@@ -3,6 +3,7 @@ import * as Yup from "yup";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../services/authService";
+import Header from '../components/Header';
 import './LoginPage.css';
 
 const validationSchema = Yup.object().shape({
@@ -92,6 +93,15 @@ function LoginPage() {
         <nav className="login-nav">
           <Link to="/">Вернуться в чат</Link>
         </nav>
+
+        <div className="login-footer">
+          <p>
+            Нет аккаунта?{' '}
+            <Link to="/signup" className="login-link">
+              Зарегистрироваться
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )
