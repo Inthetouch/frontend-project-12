@@ -23,8 +23,37 @@ export const login = async (username, password) => {
   }
 };
 
+export const signup = async (username, password) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/signup`, {
+      username,
+      password,
+    });
+
+    const { token } = response.data;
+    if (token) {
+      localStorage.setItem('token', token);
+      localStorage.setItem('username', username);
+    }
+
+    return token;
+  } catch (error) {
+    if (error.response?.status === 409) {
+      throw new Error('Пользователь с таким именем уже существует');
+    }
+
+    const message =
+      error.response?.data?.message || 'Ошибка регистрации. Попробуйте позже.';
+    throw new Error(message);
+  }
+};
+
 export const getToken = () => {
   return localStorage.getItem("token");
+};
+
+export const getUsername = () => {
+  return localStorage.getItem('username');
 };
 
 export const isAuthenticated = () => {
