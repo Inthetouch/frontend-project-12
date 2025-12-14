@@ -25,6 +25,7 @@ import {
   onRemoveChannel,
   offRemoveChannel,
 } from '../services/socketService';
+import Header from '../components/Header';
 import ChannelList from '../components/ChannelList';
 import MessageList from '../components/MessageList';
 import MessageForm from '../components/MessageForm';
@@ -153,66 +154,69 @@ const MainPage = () => {
   };
 
   return (
-    <div className="chat-page">
-      <header className="chat-header">
-        <h1>Чат</h1>
-        <div className='header-status'>
-          <span className={`socket-status ${socketConnected ? 'connected' : 'disconnected'}`}>
-            {socketConnected ? '● Подключено' : '● Отключено'}
-          </span>
-          <button onClick={handleLogout} className="logout-button">
-            Выйти
-          </button>
-        </div>
-      </header>
+    <>
+      <Header />
+      <div className="chat-page">
+        <header className="chat-header">
+          <h1>Чат</h1>
+          <div className='header-status'>
+            <span className={`socket-status ${socketConnected ? 'connected' : 'disconnected'}`}>
+              {socketConnected ? '● Подключено' : '● Отключено'}
+            </span>
+            <button onClick={handleLogout} className="logout-button">
+              Выйти
+            </button>
+          </div>
+        </header>
 
-      {error && (
-        <div className='chat-error'>
-          <p>Ошибка: {error}</p>
-        </div>
-      )}
+        {error && (
+          <div className='chat-error'>
+            <p>Ошибка: {error}</p>
+          </div>
+        )}
 
-      {loading ? (
-        <div className='chat-loading'>
-          <p>Загрузка...</p>
-        </div>
-      ) : (
-        <div className="chat-container">
-          <ChannelList
-            onAddChannel={() => setShowAddModal(true)}
-            onRenameChannel={handleRenameClick}
-            onDeleteChannel={handleDeleteClick}
-          />
-          <main className="chat-main">
-            <MessageList />
-            <MessageForm />
-          </main>
-        </div>
-      )}
+        {loading ? (
+          <div className='chat-loading'>
+            <p>Загрузка...</p>
+          </div>
+        ) : (
+          <div className="chat-container">
+            <ChannelList
+              onAddChannel={() => setShowAddModal(true)}
+              onRenameChannel={handleRenameClick}
+              onDeleteChannel={handleDeleteClick}
+            />
+            <main className="chat-main">
+              <MessageList />
+              <MessageForm />
+            </main>
+          </div>
+        )}
 
-      <AddChannelModal
-        isOpen={showAddModal}
-        onClose={() => setShowAddModal(false)}
-      />
+        <AddChannelModal
+          isOpen={showAddModal}
+          onClose={() => setShowAddModal(false)}
+        />
 
-      <RenameChannelModal
-        isOpen={showRenameModal}
-        onClose={() => {
-          setShowRenameModal(false);
-          setSelectedChannel(null);
-        }}
-        channel={selectedChannel}
-      />
+        <RenameChannelModal
+          isOpen={showRenameModal}
+          onClose={() => {
+            setShowRenameModal(false);
+            setSelectedChannel(null);
+          }}
+          channel={selectedChannel}
+        />
 
-      <DeleteChannelModal
-        isOpen={showDeleteModal}
-        onClose={() => {
-          setShowDeleteModal(false);
-          setSelectedChannel(null);
-        }}
-        channel={selectedChannel}
-      />
-    </div>
+        <DeleteChannelModal
+          isOpen={showDeleteModal}
+          onClose={() => {
+            setShowDeleteModal(false);
+            setSelectedChannel(null);
+          }}
+          channel={selectedChannel}
+        />
+      </div>
+    </>
   );
 };
 

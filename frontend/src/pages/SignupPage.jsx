@@ -60,12 +60,12 @@ function SignupPage() {
             {({ isSubmitting, errors, touched }) => (
               <Form className="signup-form">
                 <div className="form-group">
-                  <label htmlFor="username">[translate:Имя пользователя]</label>
+                  <label htmlFor="username">Имя пользователя</label>
                   <Field
                     type="text"
                     id="username"
                     name="username"
-                    placeholder="[translate:Введите имя пользователя]"
+                    placeholder="Введите имя пользователя"
                     className={`form-input ${
                       errors.username && touched.username ? 'input-error' : ''
                     }`}
@@ -78,12 +78,12 @@ function SignupPage() {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="password">[translate:Пароль]</label>
+                  <label htmlFor="password">Пароль</label>
                   <Field
                     type="password"
                     id="password"
                     name="password"
-                    placeholder="[translate:Введите пароль]"
+                    placeholder="Введите пароль"
                     className={`form-input ${
                       errors.password && touched.password ? 'input-error' : ''
                     }`}
@@ -97,13 +97,13 @@ function SignupPage() {
 
                 <div className="form-group">
                   <label htmlFor="passwordConfirm">
-                    [translate:Подтвердите пароль]
+                    Подтвердите пароль
                   </label>
                   <Field
                     type="password"
                     id="passwordConfirm"
                     name="passwordConfirm"
-                    placeholder="[translate:Повторите пароль]"
+                    placeholder="Повторите пароль"
                     className={`form-input ${
                       errors.passwordConfirm && touched.passwordConfirm
                         ? 'input-error'
@@ -122,7 +122,7 @@ function SignupPage() {
                   disabled={isSubmitting}
                   className="submit-button"
                 >
-                  {isSubmitting ? '[translate:Регистрация...]' : '[translate:Зарегистрироваться]'}
+                  {isSubmitting ? 'Регистрация...' : 'Зарегистрироваться'}
                 </button>
               </Form>
             )}
@@ -130,9 +130,9 @@ function SignupPage() {
 
           <div className="signup-footer">
             <p>
-              [translate:Уже есть аккаунт?]{' '}
+              Уже есть аккаунт?{' '}
               <Link to="/login" className="signup-link">
-                [translate:Войти]
+                Войти
               </Link>
             </p>
           </div>
