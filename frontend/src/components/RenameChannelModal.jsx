@@ -4,6 +4,7 @@ import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import { renameChannel } from '../store/chatSlice';
 import { showSuccessToast, showErrorToast } from '../utils/toastService';
+import { cleanProfanity, isProfane } from '../utils/profanityFilter';
 import Modal from './Modal';
 
 function RenameChannelModal({ isOpen, onClose, channel }) {
@@ -25,13 +26,17 @@ function RenameChannelModal({ isOpen, onClose, channel }) {
             ch.name?.toLowerCase() === value?.toLowerCase() &&
             ch.id !== channel.id
         );
+      })
+      .test('profanity', t('chat.channelModal.rename.validation.profanity'), (value) => {
+        return !isProfane(value);
       }),
   });
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
+      const cleanedName = cleanProfanity(values.name);
       await dispatch(
-        renameChannel({ channelId: channel.id, name: values.name })
+        renameChannel({ channelId: channel.id, name: cleanedName })
       ).unwrap();
       showSuccessToast('toast.channel.renamed');
       onClose();

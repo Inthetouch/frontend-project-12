@@ -22,8 +22,8 @@ export const fetchChatData = async () => {
 export const addMessage = async (channelId, body, username) => {
   try {
     const response = await axios.post(
-      `${API_BASE_URL}/channels/${channelId}/messages`,
-      { body, username }
+      `${API_BASE_URL}/messages`,
+      { body, channelId, username }
     );
     return response.data;
   } catch (error) {

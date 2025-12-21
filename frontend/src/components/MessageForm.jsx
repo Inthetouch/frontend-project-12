@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { sendMessage, setError } from '../store/chatSlice';
 import { useTranslation } from 'react-i18next';
 import { showErrorToast, showWarningToast } from '../utils/toastService';
+import { cleanProfanity, isProfane } from '../utils/profanityFilter';
 
 function MessageForm() {
   const { t } = useTranslation();
@@ -37,13 +38,24 @@ function MessageForm() {
       return;
     }
 
+    if (!currentChannelId) {
+    setLocalError(t('chat.messages.errors.sendError'));
+    return;
+  }
+
     try {
       setLocalError(null);
+
+      const cleanedMessage = cleanProfanity(messageBody);
+
+      if (isProfane(messageBody)) {
+        console.warn('Message contained profanity, cleaned:', cleanedMessage);
+      }
 
       await dispatch(
         sendMessage({
           channelId: currentChannelId,
-          body: messageBody,
+          body: cleanedMessage,
           username,
         })
       ).unwrap();
