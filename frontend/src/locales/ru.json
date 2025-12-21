@@ -1,0 +1,128 @@
+{
+  "common": {
+    "appName": "Hexlet Chat",
+    "logout": "Выйти",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "delete": "Удалить",
+    "create": "Создать",
+    "rename": "Переименовать",
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "success": "Успешно",
+    "empty": "Пусто"
+  },
+  "auth": {
+    "login": {
+      "title": "Вход в чат",
+      "username": "Имя пользователя",
+      "usernamePlaceholder": "Введите имя пользователя",
+      "password": "Пароль",
+      "passwordPlaceholder": "Введите пароль",
+      "button": "Войти",
+      "noAccount": "Нет аккаунта?",
+      "signup": "Зарегистрироваться",
+      "testCredentials": "Для тестирования используйте:",
+      "testLogin": "Логин:",
+      "testPassword": "Пароль:"
+    },
+    "signup": {
+      "title": "Регистрация",
+      "username": "Имя пользователя",
+      "usernamePlaceholder": "Введите имя пользователя",
+      "password": "Пароль",
+      "passwordPlaceholder": "Введите пароль",
+      "passwordConfirm": "Подтвердите пароль",
+      "passwordConfirmPlaceholder": "Повторите пароль",
+      "button": "Зарегистрироваться",
+      "hasAccount": "Уже есть аккаунт?",
+      "login": "Войти"
+    },
+    "validation": {
+      "usernameTooShort": "Имя должно содержать минимум 3 символа",
+      "usernameTooLong": "Имя не должно превышать 20 символов",
+      "usernameRequired": "Имя пользователя обязательно",
+      "passwordTooShort": "Пароль должен содержать минимум 6 символов",
+      "passwordRequired": "Пароль обязателен",
+      "passwordConfirmRequired": "Подтверждение пароля обязательно",
+      "passwordMismatch": "Пароли должны совпадать",
+      "userAlreadyExists": "Пользователь с таким именем уже существует",
+      "authError": "Ошибка авторизации. Попробуйте позже.",
+      "signupError": "Ошибка регистрации. Попробуйте позже."
+    }
+  },
+  "chat": {
+    "main": {
+      "title": "Чат",
+      "connected": "● Подключено",
+      "disconnected": "● Отключено",
+      "loading": "Загрузка данных чата..."
+    },
+    "channels": {
+      "title": "Каналы",
+      "addChannel": "Добавить канал",
+      "general": "General"
+    },
+    "channelModal": {
+      "add": {
+        "title": "Создать новый канал",
+        "name": "Имя канала",
+        "namePlaceholder": "Введите имя канала",
+        "button": "Создать",
+        "creating": "Создание...",
+        "validation": {
+          "nameTooShort": "Имя канала должно быть от 3 символов",
+          "nameTooLong": "Имя канала не должно превышать 20 символов",
+          "nameRequired": "Имя канала обязательно",
+          "nameDuplicate": "Канал с таким именем уже существует"
+        }
+      },
+      "rename": {
+        "title": "Переименовать канал",
+        "name": "Новое имя канала",
+        "button": "Сохранить",
+        "saving": "Сохранение...",
+        "validation": {
+          "nameTooShort": "Имя канала должно быть от 3 символов",
+          "nameTooLong": "Имя канала не должно превышать 20 символов",
+          "nameRequired": "Имя канала обязательно",
+          "nameDuplicate": "Канал с таким именем уже существует"
+        }
+      },
+      "delete": {
+        "title": "Удалить канал",
+        "message": "Вы уверены, что хотите удалить канал {{name}}?",
+        "warning": "Это действие необратимо. Все сообщения в этом канале будут удалены.",
+        "button": "Удалить",
+        "deleting": "Удаление...",
+        "menu": "Удалить"
+      }
+    },
+    "messages": {
+      "empty": "Нет сообщений. Начните беседу!",
+      "placeholder": "Введите сообщение...",
+      "send": "Отправить",
+      "sending": "Отправка...",
+      "validation": {
+        "empty": "Сообщение не может быть пустым"
+      },
+      "errors": {
+        "connectionLost": "Нет подключения к серверу. Попробуйте позже.",
+        "sendError": "Ошибка отправки сообщения"
+      }
+    },
+    "menu": {
+      "rename": "✎ Переименовать",
+      "delete": "✕ Удалить"
+    },
+    "errors": {
+      "connectionError": "Ошибка подключения к серверу"
+    }
+  },
+  "notFound": {
+    "title": "404",
+    "message": "Страница не найдена",
+    "description": "Запрашиваемый маршрут не существует.",
+    "link": "Вернуться на главную"
+  }
+}

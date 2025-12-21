@@ -1,9 +1,11 @@
 import { useRef, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const DEFAULT_CHANNELS = ['general', 'random'];
 
 function ChannelMenu({ channel, onRename, onDelete, isLoading }) {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useTranslation();
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -48,7 +50,7 @@ function ChannelMenu({ channel, onRename, onDelete, isLoading }) {
         className="channel-menu__toggle"
         onClick={() => setIsOpen(!isOpen)}
         disabled={isLoading}
-        aria-label="Меню канала"
+        aria-label={t('chat.menu.rename')}
         aria-expanded={isOpen}
       >
         ⋮
@@ -61,7 +63,7 @@ function ChannelMenu({ channel, onRename, onDelete, isLoading }) {
             onClick={handleRename}
             disabled={isLoading}
           >
-            ✎ Переименовать
+            {t('chat.menu.rename')}
           </button>
 
           <button
@@ -69,7 +71,7 @@ function ChannelMenu({ channel, onRename, onDelete, isLoading }) {
             onClick={handleDelete}
             disabled={isLoading}
           >
-            ✕ Удалить
+            {t('chat.channelModal.delete.menu')}
           </button>
         </div>
       )}

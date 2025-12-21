@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 
 function MessageList() {
   const { messages, currentChannelId } = useSelector((state) => state.chat);
   const messagesEndRef = useRef(null);
+  const { t } = useTranslation();
 
   const currentMessages = useMemo(
     () => messages[currentChannelId] || [],
@@ -31,7 +33,7 @@ function MessageList() {
     <div className="message-list">
       <div className="message-list__messages">
         {currentMessages.length === 0 ? (
-          <p className="message-list__empty">Нет сообщений. Начните беседу!</p>
+          <p className="message-list__empty">{t('chat.messages.empty')}</p>
         ) : (
           currentMessages.map((message) => (
             <div key={message.id} className="message">

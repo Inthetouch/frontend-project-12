@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {useDispatch, useSelector} from 'react-redux';
 import { setCurrentChannel } from '../store/chatSlice';
 import ChannelMenu from './ChannelMenu';
 
 function ChannelList({ onAddChannel, onRenameChannel, onDeleteChannel }) {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const { channels, currentChannelId, isLoadingChannels } = useSelector((state) => state.chat);
 
   const handleChannelClick = (channelId) => {
@@ -14,11 +15,11 @@ function ChannelList({ onAddChannel, onRenameChannel, onDeleteChannel }) {
   return (
     <aside className="channel-list">
       <div className="channel-list__header">
-        <h2 className="channel-list__title">Каналы</h2>
+        <h2 className="channel-list__title">{t('chat.channels.title')}</h2>
         <button
           className="channel-list__add-btn"
           onClick={onAddChannel}
-          title="Добавить канал"
+          title={t('chat.channels.addChannel')}
           disabled={isLoadingChannels}
         >
           +

@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { sendMessage, setError } from '../store/chatSlice';
+import { useTranslation } from 'react-i18next';
 
 function MessageForm() {
+  const { t } = useTranslation();
   const [messageBody, setMessageBody] = useState('');
   const [localError, setLocalError] = useState(null);
   const dispatch = useDispatch();
@@ -23,12 +25,12 @@ function MessageForm() {
     e.preventDefault();
 
     if (!messageBody.trim()) {
-      setLocalError('Сообщение не может быть пустым');
+      setLocalError(t('chat.messages.validation.empty'));
       return;
     }
 
     if (!socketConnected) {
-      setLocalError('Нет подключения к серверу. Попробуйте позже.');
+      setLocalError(t('chat.messages.errors.connectionLost'));
       return;
     }
 
@@ -46,7 +48,7 @@ function MessageForm() {
       setMessageBody('');
     } catch (error) {
       console.error('Ошибка отправки сообщения:', error);
-      setLocalError(error.message || 'Ошибка отправки сообщения');
+      setLocalError(error.message || t('chat.messages.errors.sendError'));
       dispatch(setError(error.message));
     }
   };
@@ -58,7 +60,7 @@ function MessageForm() {
       <input
         type="text"
         className="message-form__input"
-        placeholder="Введите сообщение..."
+        placeholder={t('chat.messages.placeholder')}
         value={messageBody}
         onChange={(e) => setMessageBody(e.target.value)}
         disabled={isSending || !socketConnected}
@@ -69,7 +71,7 @@ function MessageForm() {
         className="message-form__button"
         disabled={isSending || !socketConnected || !messageBody.trim()}
       >
-        {isSending ? 'Отправка...' : 'Отправить'}
+        {isSending ? t('common.loading') : t('chat.messages.send')}
       </button>
     </form>
   );

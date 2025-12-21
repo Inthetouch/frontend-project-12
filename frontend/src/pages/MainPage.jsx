@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
   initializeChat, 
   addMessageFromSocket, 
@@ -36,6 +37,7 @@ import DeleteChannelModal from '../components/DeleteChannelModal';
 const MainPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { loading, error, socketConnected} = useSelector((state) => state.chat);
 
   const [showAddModal, setShowAddModal] = useState(false);
@@ -108,7 +110,7 @@ const MainPage = () => {
           navigate('/login');
           return;
         }
-        dispatch(setError('Ошибка подключения к серверу'));
+        dispatch(setError(t('chat.errors.connectionError')));
       }
     };
 
@@ -135,7 +137,7 @@ const MainPage = () => {
       disconnectSocket();
       dispatch(setSocketConnected(false));
     }
-  }, [dispatch, navigate]);
+  }, [dispatch, navigate, t]);
 
   const handleRenameClick = (channel) => {
     setSelectedChannel(channel);
@@ -158,26 +160,26 @@ const MainPage = () => {
       <Header />
       <div className="chat-page">
         <header className="chat-header">
-          <h1>Чат</h1>
+          <h1>{t('chat.main.title')}</h1>
           <div className='header-status'>
             <span className={`socket-status ${socketConnected ? 'connected' : 'disconnected'}`}>
-              {socketConnected ? '● Подключено' : '● Отключено'}
+              {socketConnected ? t('chat.main.connected') : t('chat.main.disconnected')}
             </span>
             <button onClick={handleLogout} className="logout-button">
-              Выйти
+              {t('common.logout')}
             </button>
           </div>
         </header>
 
         {error && (
           <div className='chat-error'>
-            <p>Ошибка: {error}</p>
+            <p>{t('common.error')}: {error}</p>
           </div>
         )}
 
         {loading ? (
           <div className='chat-loading'>
-            <p>Загрузка...</p>
+            <p>{t('chat.main.loading')}</p>
           </div>
         ) : (
           <div className="chat-container">

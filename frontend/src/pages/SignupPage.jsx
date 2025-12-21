@@ -2,25 +2,27 @@ import { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { signup } from '../services/authService';
 import Header from '../components/Header';
 
-const validationSchema = Yup.object().shape({
-  username: Yup.string()
-    .min(3, "Имя должно содержать минимум 3 символа")
-    .max(20, "Имя не должно превышать 20 символов")
-    .required("Имя пользователя обязательно"),
-  password: Yup.string()
-    .min(6, "Пароль должен содержать минимум 6 символов")
-    .required("Пароль обязателен"),
-  passwordConfirm: Yup.string()
-    .oneOf([Yup.ref('password')], "Пароли должны совпадать")
-    .required("Подтверждение пароля обязательно"),
-});
-
 function SignupPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [serverError, setServerError] = useState(null);
+
+  const validationSchema = Yup.object().shape({
+  username: Yup.string()
+    .min(3,  t('auth.validation.usernameTooShort'))
+    .max(20, t('auth.validation.usernameTooLong'))
+    .required(t('auth.validation.usernameRequired')),
+  password: Yup.string()
+    .min(6, t('auth.validation.passwordTooShort'))
+    .required(t('auth.validation.passwordRequired')),
+  passwordConfirm: Yup.string()
+    .oneOf([Yup.ref('password')], t('auth.validation.passwordMismatch'))
+    .required(t('auth.validation.passwordConfirmRequired')),
+  });
 
   const handleSubmit = async (values, { setSubmitting }) => {
     setServerError(null);
@@ -40,7 +42,7 @@ function SignupPage() {
       <Header />
       <div className="signup-page">
         <div className="signup-container">
-          <h1>Регистрация</h1>
+          <h1>{t('auth.signup.title')}</h1>
 
           {serverError && (
             <div className="alert alert-error">
@@ -60,12 +62,12 @@ function SignupPage() {
             {({ isSubmitting, errors, touched }) => (
               <Form className="signup-form">
                 <div className="form-group">
-                  <label htmlFor="username">Имя пользователя</label>
+                  <label htmlFor="username">{t('auth.signup.username')}</label>
                   <Field
                     type="text"
                     id="username"
                     name="username"
-                    placeholder="Введите имя пользователя"
+                    placeholder={t('auth.signup.usernamePlaceholder')}
                     className={`form-input ${
                       errors.username && touched.username ? 'input-error' : ''
                     }`}
@@ -78,12 +80,12 @@ function SignupPage() {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="password">Пароль</label>
+                  <label htmlFor="password">{t('auth.signup.password')}</label>
                   <Field
                     type="password"
                     id="password"
                     name="password"
-                    placeholder="Введите пароль"
+                    placeholder={t('auth.signup.passwordPlaceholder')}
                     className={`form-input ${
                       errors.password && touched.password ? 'input-error' : ''
                     }`}
@@ -97,13 +99,13 @@ function SignupPage() {
 
                 <div className="form-group">
                   <label htmlFor="passwordConfirm">
-                    Подтвердите пароль
+                    {t('auth.signup.passwordConfirm')}
                   </label>
                   <Field
                     type="password"
                     id="passwordConfirm"
                     name="passwordConfirm"
-                    placeholder="Повторите пароль"
+                    placeholder={t('auth.signup.passwordConfirmPlaceholder')}
                     className={`form-input ${
                       errors.passwordConfirm && touched.passwordConfirm
                         ? 'input-error'
@@ -122,7 +124,7 @@ function SignupPage() {
                   disabled={isSubmitting}
                   className="submit-button"
                 >
-                  {isSubmitting ? 'Регистрация...' : 'Зарегистрироваться'}
+                  {isSubmitting ? t('common.loading') : t('auth.signup.button')}
                 </button>
               </Form>
             )}
@@ -130,9 +132,9 @@ function SignupPage() {
 
           <div className="signup-footer">
             <p>
-              Уже есть аккаунт?{' '}
+              {t('auth.signup.hasAccount')}{' '}
               <Link to="/login" className="signup-link">
-                Войти
+                {t('auth.signup.login')}
               </Link>
             </p>
           </div>

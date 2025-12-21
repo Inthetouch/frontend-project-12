@@ -2,26 +2,28 @@ import { useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { useTranslation } from 'react-i18next';
 import { createChannel } from '../store/chatSlice';
 import Modal from './Modal';
 
-const validationSchema = Yup.object().shape({
+function AddChannelModal({ isOpen, onClose }) {
+  const dispatch = useDispatch();
+  const { t } = useTranslation();
+  const { channels, isLoadingChannels } = useSelector((state) => state.chat);
+  const inputRef = useRef(null);
+
+  const validationSchema = Yup.object().shape({
   name: Yup.string()
-    .min(3, 'Имя канала должно быть от 3 символов')
-    .max(20, 'Имя канала не должно превышать 20 символов')
-    .required('Имя канала обязательно')
-    .test('unique', 'Канал с таким именем уже существует', function (value) {
+    .min(3, t('chat.channelModal.add.validation.nameTooShort'))
+    .max(20, t('chat.channelModal.add.validation.nameTooLong'))
+    .required(t('chat.channelModal.add.validation.nameRequired'))
+    .test('unique', t('chat.channelModal.add.validation.nameDuplicate'), function (value) {
       const { channels } = this.options.context;
       return !channels.some(
         (ch) => ch.name.toLowerCase() === value?.toLowerCase()
       );
     }),
-});
-
-function AddChannelModal({ isOpen, onClose }) {
-  const dispatch = useDispatch();
-  const { channels, isLoadingChannels } = useSelector((state) => state.chat);
-  const inputRef = useRef(null);
+  });
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
@@ -35,7 +37,7 @@ function AddChannelModal({ isOpen, onClose }) {
   };
 
   return (
-    <Modal isOpen={isOpen} title="Создать новый канал" onClose={onClose}>
+    <Modal isOpen={isOpen} title={t('chat.channelModal.add.title')} onClose={onClose}>
       {({ firstFocusableRef }) => (
         <Formik
           initialValues={{ name: '' }}
@@ -43,7 +45,7 @@ function AddChannelModal({ isOpen, onClose }) {
             Yup.object().shape({
               name: Yup.string().test(
                 'unique',
-                'Канал с таким именем уже существует',
+                t('chat.channelModal.add.validation.nameDuplicate'),
                 function (value) {
                   return !channels.some(
                     (ch) => ch.name.toLowerCase() === value?.toLowerCase()
@@ -58,7 +60,7 @@ function AddChannelModal({ isOpen, onClose }) {
           {({ isSubmitting, errors, touched }) => (
             <Form className="channel-form">
               <div className="form-group">
-                <label htmlFor="channel-name">Имя канала</label>
+                <label htmlFor="channel-name">{t('chat.channelModal.add.name')}</label>
                 <Field
                   ref={(el) => {
                     firstFocusableRef.current = el;
@@ -67,7 +69,7 @@ function AddChannelModal({ isOpen, onClose }) {
                   type="text"
                   id="channel-name"
                   name="name"
-                  placeholder="Введите имя канала"
+                  placeholder={t('chat.channelModal.add.namePlaceholder')}
                   className={`form-input ${
                     errors.name && touched.name ? 'input-error' : ''
                   }`}
@@ -86,14 +88,14 @@ function AddChannelModal({ isOpen, onClose }) {
                   disabled={isSubmitting || isLoadingChannels}
                   className="btn btn--primary"
                 >
-                  {isSubmitting ? 'Создание...' : 'Создать'}
+                  {isSubmitting ? t('common.loading') : t('chat.channelModal.add.button')}
                 </button>
                 <button
                   type="button"
                   onClick={onClose}
                   className="btn btn--secondary"
                 >
-                  Отмена
+                  {t('common.cancel')}
                 </button>
               </div>
             </Form>

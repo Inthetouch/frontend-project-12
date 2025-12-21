@@ -1,24 +1,26 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../services/authService";
 import Header from '../components/Header';
 import './LoginPage.css';
 
-const validationSchema = Yup.object().shape({
-  username: Yup.string()
-    .min(3, "Имя должно содержать минимум 3 символа")
-    .max(20, "Имя должно содержать максимум 20 символов")
-    .required("Имя пользователя обязательно"),
-  password: Yup.string()
-    .min(5, "Пароль должен содержать минимум 5 символов")
-    .required("Пароль обязателен"),
-});
-
 function LoginPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [serverError, setServerError] = useState(null);
+
+  const validationSchema = Yup.object().shape({
+  username: Yup.string()
+    .min(3, t('auth.validation.usernameTooShort'))
+    .max(20, t('auth.validation.usernameTooLong'))
+    .required(t('auth.validation.usernameRequired')),
+  password: Yup.string()
+    .min(5, t('auth.validation.passwordTooShort'))
+    .required(t('auth.validation.passwordRequired')),
+  });
 
   const handleSubmit = async (values, {setSubmitting}) => {
     setServerError(null);
@@ -35,7 +37,7 @@ function LoginPage() {
   return (
     <div className="login-page">
       <div className="login-container">
-        <h1>Вход</h1>
+        <h1>{t('auth.login.title')}</h1>
         {serverError && <div className="alert alert-error">{serverError}</div>}
         <Formik
           initialValues={{ 
@@ -48,12 +50,12 @@ function LoginPage() {
           {({ isSubmitting, errors, touched }) => (
             <Form className="login-form">
               <div className="form-group">
-                <label htmlFor="username">Имя пользователя</label>
+                <label htmlFor="username">{t('auth.login.username')}</label>
                 <Field 
                   type="text" 
                   name="username"
                   id="username"
-                  placeholder="Введите имя пользователя"
+                  placeholder={t('auth.login.usernamePlaceholder')}
                   className={`form-input ${
                     errors.username && touched.username ? 'input-error' : ''
                   }`}
@@ -61,12 +63,12 @@ function LoginPage() {
                 <ErrorMessage name="username" component="div" className="error-message"/>
               </div>
               <div className="form-group">
-                <label htmlFor="password">Пароль</label>
+                <label htmlFor="password">{t('auth.login.password')}</label>
                 <Field 
                   type="password" 
                   name="password"
                   id="password"
-                  placeholder="Введите пароль"
+                  placeholder={t('auth.login.passwordPlaceholder')}
                   className={`form-input ${
                     errors.password && touched.password ? 'input-error' : ''
                   }`}
@@ -78,27 +80,27 @@ function LoginPage() {
                 disabled={isSubmitting}
                 className="submit-button"
               >
-                {isSubmitting ? 'Загрузка...' : 'Войти'}
+                {isSubmitting ? t('common.loading') : t('auth.login.button')}
               </button>
             </Form>
           )}
         </Formik>
 
         <div className="login-hint">
-          <p>Для тестирования используйте:</p>
-          <p>Логин: <strong>admin</strong></p>
-          <p>Пароль: <strong>admin</strong></p>
+          <p>{t('auth.login.testCredentials')}</p>
+          <p>{t('auth.login.testLogin')} <strong>admin</strong></p>
+          <p>{t('auth.login.testPassword')} <strong>admin</strong></p>
         </div>
 
         <nav className="login-nav">
-          <Link to="/">Вернуться в чат</Link>
+          <Link to="/">{t('notFound.link')}</Link>
         </nav>
 
         <div className="login-footer">
           <p>
-            Нет аккаунта?{' '}
+            {t('auth.login.noAccount')}{' '}
             <Link to="/signup" className="login-link">
-              Зарегистрироваться
+              {t('auth.login.signup')}
             </Link>
           </p>
         </div>

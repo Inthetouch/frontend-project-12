@@ -1,21 +1,23 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { useTranslation } from 'react-i18next';
 import { renameChannel } from '../store/chatSlice';
 import Modal from './Modal';
 
 function RenameChannelModal({ isOpen, onClose, channel }) {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const { channels, isLoadingChannels } = useSelector((state) => state.chat);
 
   if (!channel) return null;
 
   const validationSchema = Yup.object().shape({
     name: Yup.string()
-      .min(3, 'Имя канала должно быть от 3 символов')
-      .max(20, 'Имя канала не должно превышать 20 символов')
-      .required('Имя канала обязательно')
-      .test('unique', 'Канал с таким именем уже существует', (value) => {
+      .min(3, t('chat.channelModal.rename.validation.nameTooShort'))
+      .max(20, t('chat.channelModal.rename.validation.nameTooLong'))
+      .required(t('chat.channelModal.rename.validation.nameRequired'))
+      .test('unique', t('chat.channelModal.rename.validation.nameDuplicate'), (value) => {
         if (!value) return true;
         return !channels.some(
           (ch) =>
@@ -39,7 +41,7 @@ function RenameChannelModal({ isOpen, onClose, channel }) {
   };
 
   return (
-    <Modal isOpen={isOpen} title="Переименовать канал" onClose={onClose}>
+    <Modal isOpen={isOpen} title={t('chat.channelModal.rename.title')} onClose={onClose}>
       {({ firstFocusableRef }) => (
         <Formik
           initialValues={{ name: channel.name || '' }}
@@ -50,7 +52,7 @@ function RenameChannelModal({ isOpen, onClose, channel }) {
           {({ isSubmitting, errors, touched }) => (
             <Form className="channel-form">
               <div className="form-group">
-                <label htmlFor="rename-channel">Новое имя канала</label>
+                <label htmlFor="rename-channel">{t('chat.channelModal.rename.name')}</label>
                 <Field
                   ref={firstFocusableRef}
                   type="text"
@@ -74,14 +76,14 @@ function RenameChannelModal({ isOpen, onClose, channel }) {
                   disabled={isSubmitting || isLoadingChannels}
                   className="btn btn--primary"
                 >
-                  {isSubmitting ? 'Сохранение...' : 'Сохранить'}
+                  {isSubmitting ? t('common.loading') : t('common.save')}
                 </button>
                 <button
                   type="button"
                   onClick={onClose}
                   className="btn btn--secondary"
                 >
-                  Отмена
+                  {t('common.cancel')}
                 </button>
               </div>
             </Form>

@@ -1,9 +1,11 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteChannel } from '../store/chatSlice';
+import { useTranslation } from 'react-i18next';
 import Modal from './Modal';
 
 function DeleteChannelModal({ isOpen, onClose, channel }) {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const { isLoadingChannels } = useSelector((state) => state.chat);
 
   if (!channel) return null;
@@ -18,13 +20,13 @@ function DeleteChannelModal({ isOpen, onClose, channel }) {
   };
 
   return (
-    <Modal isOpen={isOpen} title="Удалить канал" onClose={onClose}>
+    <Modal isOpen={isOpen} title={t('chat.channelModal.delete.title')} onClose={onClose}>
       <div className="delete-confirm">
         <p className="delete-confirm__message">
-          Вы уверены, что хотите удалить канал <strong>#{channel.name}</strong>?
+          {t('chat.channelModal.delete.message', { name: `#${channel.name}` })}
         </p>
         <p className="delete-confirm__warning">
-          Это действие необратимо. Все сообщения в этом канале будут удалены.
+          {t('chat.channelModal.delete.warning')}
         </p>
 
         <div className="delete-confirm__actions">
@@ -34,7 +36,7 @@ function DeleteChannelModal({ isOpen, onClose, channel }) {
             disabled={isLoadingChannels}
             className="btn btn--danger"
           >
-            {isLoadingChannels ? 'Удаление...' : 'Удалить'}
+            {isLoadingChannels ? t('common.loading') : t('common.delete')}
           </button>
           <button
             type="button"
@@ -42,7 +44,7 @@ function DeleteChannelModal({ isOpen, onClose, channel }) {
             disabled={isLoadingChannels}
             className="btn btn--secondary"
           >
-            Отмена
+            {t('common.cancel')}
           </button>
         </div>
       </div>
