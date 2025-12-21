@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteChannel } from '../store/chatSlice';
 import { useTranslation } from 'react-i18next';
+import { showSuccessToast, showErrorToast } from '../utils/toastService';
 import Modal from './Modal';
 
 function DeleteChannelModal({ isOpen, onClose, channel }) {
@@ -13,9 +14,11 @@ function DeleteChannelModal({ isOpen, onClose, channel }) {
   const handleConfirm = async () => {
     try {
       await dispatch(deleteChannel({ channelId: channel.id })).unwrap();
+      showSuccessToast('toast.channel.deleted');
       onClose();
     } catch (error) {
       console.error('Failed to delete channel:', error);
+      showErrorToast('toast.channel.deleteError');
     }
   };
 

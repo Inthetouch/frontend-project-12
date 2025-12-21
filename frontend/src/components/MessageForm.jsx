@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { sendMessage, setError } from '../store/chatSlice';
 import { useTranslation } from 'react-i18next';
+import { showErrorToast, showWarningToast } from '../utils/toastService';
 
 function MessageForm() {
   const { t } = useTranslation();
@@ -26,11 +27,13 @@ function MessageForm() {
 
     if (!messageBody.trim()) {
       setLocalError(t('chat.messages.validation.empty'));
+      showWarningToast('chat.messages.validation.empty');
       return;
     }
 
     if (!socketConnected) {
       setLocalError(t('chat.messages.errors.connectionLost'));
+      showErrorToast('toast.message.connectionError');
       return;
     }
 
@@ -49,6 +52,7 @@ function MessageForm() {
     } catch (error) {
       console.error('Ошибка отправки сообщения:', error);
       setLocalError(error.message || t('chat.messages.errors.sendError'));
+      showErrorToast('toast.message.sendError');
       dispatch(setError(error.message));
     }
   };

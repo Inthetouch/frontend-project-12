@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { isAuthenticated, logout, getUsername } from '../services/authService';
+import { showSuccessToast } from '../utils/toastService';
 
 function Header() {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ function Header() {
 
   const handleLogout = () => {
     logout();
+    showSuccessToast('toast.auth.logoutSuccess');
     navigate('/login');
   };
 

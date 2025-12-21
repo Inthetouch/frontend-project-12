@@ -26,6 +26,7 @@ import {
   onRemoveChannel,
   offRemoveChannel,
 } from '../services/socketService';
+import { showErrorToast, showInfoToast, showSuccessToast } from '../utils/toastService';
 import Header from '../components/Header';
 import ChannelList from '../components/ChannelList';
 import MessageList from '../components/MessageList';
@@ -33,6 +34,7 @@ import MessageForm from '../components/MessageForm';
 import AddChannelModal from '../components/AddChannelModal';
 import RenameChannelModal from '../components/RenameChannelModal';
 import DeleteChannelModal from '../components/DeleteChannelModal';
+import { toast } from 'react-toastify';
 
 const MainPage = () => {
   const dispatch = useDispatch();
@@ -44,6 +46,7 @@ const MainPage = () => {
   const [showRenameModal, setShowRenameModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedChannel, setSelectedChannel] = useState(null);
+  const wasConnected = useRef(false);
 
   const handlersRef = useRef({ 
     handleNewMessage: null, 
@@ -56,6 +59,16 @@ const MainPage = () => {
   useEffect(() => {
     dispatch(initializeChat());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (socketConnected && !wasConnected.current) {
+      wasConnected.current = true;
+    } else if (socketConnected && wasConnected.current) {
+      showInfoToast('toast.network.online');
+    } else if (!socketConnected && wasConnected.current) {
+      showErrorToast('toast.network.offline');
+    }
+  }, [socketConnected]);
 
   useEffect(() => {
     const handlers = handlersRef.current;
@@ -74,6 +87,7 @@ const MainPage = () => {
         const handleError = (errorMessage) => {
           console.error('Socket error:', errorMessage);
           dispatch(setError(errorMessage));
+          showErrorToast('toast.message.connectionError');
         };
         
         const handleNewChannel = (channel) => {
@@ -152,6 +166,7 @@ const MainPage = () => {
   const handleLogout = () => {
     disconnectSocket();
     logout();
+    showSuccessToast('toast.auth.logoutSuccess')
     navigate('/login');
   };
 

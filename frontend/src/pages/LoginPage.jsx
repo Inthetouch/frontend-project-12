@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../services/authService";
+import { showSuccessToast, showErrorToast } from '../utils/toastService';
 import Header from '../components/Header';
 import './LoginPage.css';
 
@@ -26,9 +27,11 @@ function LoginPage() {
     setServerError(null);
     try {
       await login(values.username, values.password);
+      showSuccessToast('toast.auth.loginSuccess');
       navigate("/");
     } catch (error) {
       setServerError(error.message);
+      showErrorToast('toast.auth.loginError');
     } finally {
       setSubmitting(false);
     }

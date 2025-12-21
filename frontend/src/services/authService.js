@@ -18,6 +18,12 @@ export const login = async (username, password) => {
     return token;
 
   } catch (error) {
+    if (error.response?.status === 401) {
+      const message = error.response?.data?.message || 'Неверное имя пользователя или пароль';
+      const customError = new Error(message);
+      customError.skipInterceptor = true;
+      throw customError;
+    }
     const message = error.response?.data?.message || 'Ошибка авторизации. Попробуйте позже.'
     throw new Error(message);
   }
@@ -84,6 +90,10 @@ export const setupAxiosInterceptors = (onUnauthorized) => {
   axios.interceptors.response.use(
     (response) => response,
     (error) => {
+      if (error.config?.url?.includes('/login') && error.response?.status === 401) {
+      return Promise.reject(error);
+    }
+
       if (error.response?.status === 401) {
         logout();
         if (onUnauthorized) {

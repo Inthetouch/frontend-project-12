@@ -4,6 +4,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import { createChannel } from '../store/chatSlice';
+import { showSuccessToast, showErrorToast } from '../utils/toastService';
 import Modal from './Modal';
 
 function AddChannelModal({ isOpen, onClose }) {
@@ -28,9 +29,11 @@ function AddChannelModal({ isOpen, onClose }) {
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       await dispatch(createChannel({ name: values.name })).unwrap();
+      showSuccessToast('toast.channel.created');
       onClose();
     } catch (error) {
       console.error('Failed to create channel:', error);
+      showErrorToast('toast.channel.createError');
     } finally {
       setSubmitting(false);
     }

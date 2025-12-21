@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { signup } from '../services/authService';
 import Header from '../components/Header';
+import { showSuccessToast, showErrorToast } from '../utils/toastService';
 
 function SignupPage() {
   const navigate = useNavigate();
@@ -29,9 +30,11 @@ function SignupPage() {
 
     try {
       await signup(values.username, values.password);
+      showSuccessToast('toast.auth.signupSuccess');
       navigate('/');
     } catch (error) {
       setServerError(error.message);
+      showErrorToast('toast.auth.signupError');
     } finally {
       setSubmitting(false);
     }

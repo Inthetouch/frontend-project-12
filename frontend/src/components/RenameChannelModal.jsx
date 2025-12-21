@@ -3,6 +3,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import { renameChannel } from '../store/chatSlice';
+import { showSuccessToast, showErrorToast } from '../utils/toastService';
 import Modal from './Modal';
 
 function RenameChannelModal({ isOpen, onClose, channel }) {
@@ -32,9 +33,11 @@ function RenameChannelModal({ isOpen, onClose, channel }) {
       await dispatch(
         renameChannel({ channelId: channel.id, name: values.name })
       ).unwrap();
+      showSuccessToast('toast.channel.renamed');
       onClose();
     } catch (error) {
       console.error('Failed to rename channel:', error);
+      showErrorToast('toast.channel.renameError');
     } finally {
       setSubmitting(false);
     }
