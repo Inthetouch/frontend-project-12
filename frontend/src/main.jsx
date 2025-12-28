@@ -9,12 +9,23 @@ import store from './store/index.js'
 import { setupAxiosInterceptors } from './services/authService.js'
 import { initializeI18n } from './i18n/config.js';
 import { initializeProfanityFilter } from './utils/profanityFilter.js';
+import { initializeRollbar } from './config/rollbar.js';
+import { logInfo } from './utils/errorLogger.js';
 import './index.css'
 
 const initializeApp = async () => {
   try {
+
+    const environment = import.meta.env.MODE || 'development';
+    initializeRollbar(environment);
+    logInfo('App initialization started', { environment });
+
     const i18n = await initializeI18n();
+    logInfo('i18n initialized');
+
     await initializeProfanityFilter();
+    logInfo('Profanity filter initialized');
+
     setupAxiosInterceptors();
 
     ReactDOM.createRoot(document.getElementById('root')).render(
@@ -38,8 +49,13 @@ const initializeApp = async () => {
         </Provider>
       </React.StrictMode>,
     );
+
+    logInfo('App mounted successfully');
   } catch (error) {
     console.error('Failed to initialize app:', error);
+    if (window.Rollbar) {
+      window.Rollbar.critical('App initialization failed', error);
+    }
   }
 };
 

@@ -27,6 +27,7 @@ import {
   offRemoveChannel,
 } from '../services/socketService';
 import { showErrorToast, showInfoToast, showSuccessToast } from '../utils/toastService';
+import { logError, logWarning, logInfo } from '../utils/errorLogger';
 import Header from '../components/Header';
 import ChannelList from '../components/ChannelList';
 import MessageList from '../components/MessageList';
@@ -34,7 +35,6 @@ import MessageForm from '../components/MessageForm';
 import AddChannelModal from '../components/AddChannelModal';
 import RenameChannelModal from '../components/RenameChannelModal';
 import DeleteChannelModal from '../components/DeleteChannelModal';
-import { toast } from 'react-toastify';
 
 const MainPage = () => {
   const dispatch = useDispatch();
@@ -57,6 +57,7 @@ const MainPage = () => {
   });
 
   useEffect(() => {
+    logInfo('MainPage mounted');
     dispatch(initializeChat());
   }, [dispatch]);
 
@@ -65,8 +66,10 @@ const MainPage = () => {
       wasConnected.current = true;
     } else if (socketConnected && wasConnected.current) {
       showInfoToast('toast.network.online');
+      logInfo('WebSocket connected');
     } else if (!socketConnected && wasConnected.current) {
       showErrorToast('toast.network.offline');
+      logWarning('WebSocket connection lost', { wasConnected });
     }
   }, [socketConnected]);
 
@@ -77,7 +80,7 @@ const MainPage = () => {
       try {
         await initializeSocket();
         dispatch(setSocketConnected(true));
-        console.log('WebSocket connected');
+        logInfo('WebSocket initialized');
 
         const handleNewMessage = (message) => {
           console.log('New message received:', message);
@@ -88,21 +91,28 @@ const MainPage = () => {
           console.error('Socket error:', errorMessage);
           dispatch(setError(errorMessage));
           showErrorToast('toast.message.connectionError');
+          logError(new Error(errorMessage), { 
+            type: 'socket_error',
+            message: errorMessage,
+          });
         };
         
         const handleNewChannel = (channel) => {
           console.log('New channel received:', channel);
           dispatch(addChannelFromSocket(channel));
+          logInfo('New channel added', { channel: channel.name });
         };
 
         const handleRenameChannel = (channel) => {
           console.log('Channel renamed:', channel);
           dispatch(updateChannelFromSocket(channel));
+          logInfo('Channel renamed', { channel: channel.name });
         };
 
         const handleRemoveChannel = (data) => {
           console.log('Channel removed:', data);
           dispatch(removeChannelFromSocket(data));
+          logInfo('Channel removed', { channelId: data.id });
         };
 
         handlers.handleNewMessage = handleNewMessage;
@@ -119,6 +129,10 @@ const MainPage = () => {
 
       } catch (error) {
         console.error('WebSocket connection error:', error);
+        logError(error, { 
+          type: 'socket_connection_error',
+          message: error.message,
+        });
         if (error.message?.includes('Unauthorized') || error.message?.includes('401')) {
           logout();
           navigate('/login');
@@ -161,6 +175,7 @@ const MainPage = () => {
   const handleDeleteClick = (channel) => {
     setSelectedChannel(channel);
     setShowDeleteModal(true);
+    logInfo('Delete channel modal opened', { channel: channel.name });
   };
 
   const handleLogout = () => {

@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { clearRollbarUser } from '../config/rollbar';
+import { logInfo, logError } from '../utils/errorLogger';
 
 const API_BASE_URL = "/api/v1";
 let interceptorsSetup = false;
@@ -14,6 +16,7 @@ export const login = async (username, password) => {
     if (token) {
       localStorage.setItem("token", token);
       localStorage.setItem("username", username);
+      logInfo('Login successful', { username });
     }
     return token;
 
@@ -40,10 +43,13 @@ export const signup = async (username, password) => {
     if (token) {
       localStorage.setItem('token', token);
       localStorage.setItem('username', username);
+      logInfo('Signup successful', { username });
     }
 
     return token;
   } catch (error) {
+    logError(error, { username, type: 'signup_error' });
+    
     if (error.response?.status === 409) {
       throw new Error('Пользователь с таким именем уже существует');
     }
@@ -67,6 +73,9 @@ export const isAuthenticated = () => {
 };
 
 export const logout = () => {
+  const username = getUsername();
+  clearRollbarUser();
+  logInfo('User logged out', { username });
   localStorage.removeItem("token");
   localStorage.removeItem("username");
 };

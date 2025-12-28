@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../services/authService";
 import { showSuccessToast, showErrorToast } from '../utils/toastService';
-import Header from '../components/Header';
+import { setRollbarUser } from '../config/rollbar';
+import { logInfo, logError } from '../utils/errorLogger';
 import './LoginPage.css';
 
 function LoginPage() {
@@ -27,10 +28,16 @@ function LoginPage() {
     setServerError(null);
     try {
       await login(values.username, values.password);
+      setRollbarUser(values.username, values.username);
+      logInfo('User logged in', { username: values.username });
       showSuccessToast('toast.auth.loginSuccess');
       navigate("/");
     } catch (error) {
       setServerError(error.message);
+      logError(error, { 
+        username: values.username,
+        type: 'login_error',
+      });
       showErrorToast('toast.auth.loginError');
     } finally {
       setSubmitting(false);
