@@ -11,6 +11,7 @@ import { initializeI18n } from './i18n/config.js';
 import { initializeProfanityFilter } from './utils/profanityFilter.js';
 import { initializeRollbar } from './config/rollbar.js';
 import { logInfo } from './utils/errorLogger.js';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css'
 
 const initializeApp = async () => {

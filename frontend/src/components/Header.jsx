@@ -1,13 +1,13 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { isAuthenticated, logout, getUsername } from '../services/authService';
+import { isAuthenticated, logout } from '../services/authService';
 import { showSuccessToast } from '../utils/toastService';
+import { Navbar, Container, Button } from 'react-bootstrap';
 
 function Header() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const authenticated = isAuthenticated();
-  const username = getUsername();
 
   const handleLogout = () => {
     logout();
@@ -16,22 +16,22 @@ function Header() {
   };
 
   return (
-    <header className="header">
-      <div className="header__container">
-        <Link to="/" className="header__logo">
+    <Navbar bg="white" expand="lg" className="shadow-sm border-bottom mb-0">
+      <Container>
+        <Navbar.Brand as={Link} to="/">
           {t('common.appName')}
-        </Link>
-
+        </Navbar.Brand>
+        
         {authenticated && (
-          <div className="header__user">
-            <span className="header__username">{username}</span>
-            <button onClick={handleLogout} className="header__logout-btn">
+            <Button 
+                variant="primary" 
+                onClick={handleLogout}
+            >
               {t('common.logout')}
-            </button>
-          </div>
+            </Button>
         )}
-      </div>
-    </header>
+      </Container>
+    </Navbar>
   );
 }
 

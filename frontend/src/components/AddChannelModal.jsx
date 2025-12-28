@@ -1,26 +1,27 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import { useFormik } from 'formik';
+import { Modal, Button, Form } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
+import * as Yup from 'yup';
 import { createChannel } from '../store/chatSlice';
 import { showSuccessToast, showErrorToast } from '../utils/toastService';
 import { cleanProfanity, isProfane } from '../utils/profanityFilter';
-import Modal from './Modal';
 
 function AddChannelModal({ isOpen, onClose }) {
-  const dispatch = useDispatch();
   const { t } = useTranslation();
-  const { channels, isLoadingChannels } = useSelector((state) => state.chat);
+  const dispatch = useDispatch();
+  const { channels } = useSelector((state) => state.chat);
   const inputRef = useRef(null);
 
   const validationSchema = Yup.object().shape({
   name: Yup.string()
+    .trim()
+    .required(t('chat.channelModal.add.validation.nameRequired'))
     .min(3, t('chat.channelModal.add.validation.nameTooShort'))
     .max(20, t('chat.channelModal.add.validation.nameTooLong'))
-    .required(t('chat.channelModal.add.validation.nameRequired'))
     .test('unique', t('chat.channelModal.add.validation.nameDuplicate'), function (value) {
-      const { channels } = this.options.context;
+      if (!value) return true;
       return !channels.some(
         (ch) => ch.name.toLowerCase() === value?.toLowerCase()
       );
@@ -30,86 +31,83 @@ function AddChannelModal({ isOpen, onClose }) {
       }),
   });
 
-  const handleSubmit = async (values, { setSubmitting }) => {
-    try {
-      const cleanedName = cleanProfanity(values.name);
-      await dispatch(createChannel({ name: cleanedName })).unwrap();
-      showSuccessToast('toast.channel.created');
-      onClose();
-    } catch (error) {
-      console.error('Failed to create channel:', error);
-      showErrorToast('toast.channel.createError');
-    } finally {
-      setSubmitting(false);
+  const formik = useFormik({
+    initialValues: {
+      name: '',
+    },
+    validationSchema,
+    validateOnBlur: false, 
+    validateOnChange: false,
+    onSubmit: async (values, { setSubmitting, resetForm }) => {
+      try {
+        const cleanedName = cleanProfanity(values.name);
+        
+        await dispatch(createChannel({ name: cleanedName })).unwrap();
+        
+        showSuccessToast('toast.channel.created');
+        onClose();
+        resetForm();
+      } catch (error) {
+        console.error('Failed to create channel:', error);
+        showErrorToast('toast.channel.createError');
+        inputRef.current?.select();
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
     }
-  };
+  }, [isOpen]);
 
   return (
-    <Modal isOpen={isOpen} title={t('chat.channelModal.add.title')} onClose={onClose}>
-      {({ firstFocusableRef }) => (
-        <Formik
-          initialValues={{ name: '' }}
-          validationSchema={validationSchema.concat(
-            Yup.object().shape({
-              name: Yup.string().test(
-                'unique',
-                t('chat.channelModal.add.validation.nameDuplicate'),
-                function (value) {
-                  return !channels.some(
-                    (ch) => ch.name.toLowerCase() === value?.toLowerCase()
-                  );
-                }
-              ),
-            })
-          )}
-          validationContext={{ channels }}
-          onSubmit={handleSubmit}
-        >
-          {({ isSubmitting, errors, touched }) => (
-            <Form className="channel-form">
-              <div className="form-group">
-                <label htmlFor="channel-name">{t('chat.channelModal.add.name')}</label>
-                <Field
-                  ref={(el) => {
-                    firstFocusableRef.current = el;
-                    inputRef.current = el;
-                  }}
-                  type="text"
-                  id="channel-name"
-                  name="name"
-                  placeholder={t('chat.channelModal.add.namePlaceholder')}
-                  className={`form-input ${
-                    errors.name && touched.name ? 'input-error' : ''
-                  }`}
-                  disabled={isSubmitting || isLoadingChannels}
-                />
-                <ErrorMessage
-                  name="name"
-                  component="div"
-                  className="error-message"
-                />
-              </div>
+    <Modal show={isOpen} onHide={onClose} centered>
+      <Modal.Header closeButton>
+        <Modal.Title>{t('chat.channelModal.add.title')}</Modal.Title>
+      </Modal.Header>
 
-              <div className="form-actions">
-                <button
-                  type="submit"
-                  disabled={isSubmitting || isLoadingChannels}
-                  className="btn btn--primary"
-                >
-                  {isSubmitting ? t('common.loading') : t('chat.channelModal.add.button')}
-                </button>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="btn btn--secondary"
-                >
-                  {t('common.cancel')}
-                </button>
-              </div>
-            </Form>
-          )}
-        </Formik>
-      )}
+      <Modal.Body>
+        <Form onSubmit={formik.handleSubmit}>
+          <Form.Group controlId="name">
+            <Form.Label className="visually-hidden">{t('chat.channelModal.add.name')}</Form.Label>
+            <Form.Control
+              ref={inputRef}
+              type="text"
+              name="name"
+              placeholder={t('chat.channelModal.add.namePlaceholder') || t('chat.channelModal.add.name')}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.name}
+              isInvalid={!!formik.errors.name}
+              disabled={formik.isSubmitting}
+              autoComplete="off"
+            />
+            <Form.Control.Feedback type="invalid">
+              {formik.errors.name}
+            </Form.Control.Feedback>
+          </Form.Group>
+          
+          <div className="d-flex justify-content-end mt-3 gap-2">
+            <Button 
+                variant="secondary" 
+                onClick={onClose} 
+                disabled={formik.isSubmitting}
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button 
+                type="submit" 
+                variant="primary" 
+                disabled={formik.isSubmitting}
+            >
+              {formik.isSubmitting ? t('common.loading') : t('chat.channelModal.add.button')}
+            </Button>
+          </div>
+        </Form>
+      </Modal.Body>
     </Modal>
   );
 }

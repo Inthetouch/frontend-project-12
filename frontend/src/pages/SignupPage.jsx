@@ -1,149 +1,168 @@
-import { useState } from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useFormik } from 'formik';
+import { Button, Form, Card, Container, Row, Col, FloatingLabel } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { signup } from '../services/authService';
+import * as Yup from 'yup';
+import { signup } from '../services/authService.js';
 import Header from '../components/Header';
 import { showSuccessToast, showErrorToast } from '../utils/toastService';
+import avatarImage from '../assets/avatar_2.jpg';
 
 function SignupPage() {
-  const navigate = useNavigate();
   const { t } = useTranslation();
-  const [serverError, setServerError] = useState(null);
+  const navigate = useNavigate();
+  const inputRef = useRef(null);
+  const [registrationError, setRegistrationError] = useState(false);
 
   const validationSchema = Yup.object().shape({
   username: Yup.string()
+    .trim()
+    .required(t('auth.validation.usernameRequired'))
     .min(3,  t('auth.validation.usernameTooShort'))
-    .max(20, t('auth.validation.usernameTooLong'))
-    .required(t('auth.validation.usernameRequired')),
+    .max(20, t('auth.validation.usernameTooLong')),
   password: Yup.string()
-    .min(6, t('auth.validation.passwordTooShort'))
-    .required(t('auth.validation.passwordRequired')),
+    .trim()
+    .required(t('auth.validation.passwordRequired'))
+    .min(6, t('auth.validation.passwordTooShort')),
   passwordConfirm: Yup.string()
-    .oneOf([Yup.ref('password')], t('auth.validation.passwordMismatch'))
-    .required(t('auth.validation.passwordConfirmRequired')),
+    .test('password-match', t('auth.validation.passwordMismatch'), function(value) {
+        return this.parent.password === value;
+      }),
   });
 
-  const handleSubmit = async (values, { setSubmitting }) => {
-    setServerError(null);
+  const formik = useFormik({
+    initialValues: {
+      username: '',
+      password: '',
+      confirmPassword: '',
+    },
+    validationSchema,
+    onSubmit: async (values) => {
+      setRegistrationError(false);
+      try {
+        await signup(values.username, values.password);
+        showSuccessToast(t('toast.auth.signupSuccess'));
+        navigate('/');
+      } catch (err) {
+        console.error(err);
+        if (err.response && err.response.status === 409) {
+          setRegistrationError(true);
+          inputRef.current?.select();
+        } else {
+          showErrorToast(t('toast.auth.signupError'));
+        }
+      }
+    },
+  });
 
-    try {
-      await signup(values.username, values.password);
-      showSuccessToast('toast.auth.signupSuccess');
-      navigate('/');
-    } catch (error) {
-      setServerError(error.message);
-      showErrorToast('toast.auth.signupError');
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   return (
-    <>
+    <div className="d-flex flex-column h-100 bg-light">
       <Header />
-      <div className="signup-page">
-        <div className="signup-container">
-          <h1>{t('auth.signup.title')}</h1>
 
-          {serverError && (
-            <div className="alert alert-error">
-              {serverError}
-            </div>
-          )}
+      <Container fluid className="h-100">
+        <Row className="justify-content-center align-items-center h-100">
+          <Col xs={12} md={8} xxl={6}>
+            <Card className="shadow-sm">
+              <Card.Body className="row p-5">
+                <Col md={6} className="d-flex align-items-center justify-content-center">
+                  <img
+                    src={avatarImage}
+                    alt={t('auth.signup.title')}
+                    className="rounded-circle"
+                    style={{ width: '200px', height: '200px', objectFit: 'cover' }}
+                  />
+                </Col>
 
-          <Formik
-            initialValues={{
-              username: '',
-              password: '',
-              passwordConfirm: '',
-            }}
-            validationSchema={validationSchema}
-            onSubmit={handleSubmit}
-          >
-            {({ isSubmitting, errors, touched }) => (
-              <Form className="signup-form">
-                <div className="form-group">
-                  <label htmlFor="username">{t('auth.signup.username')}</label>
-                  <Field
-                    type="text"
-                    id="username"
-                    name="username"
-                    placeholder={t('auth.signup.usernamePlaceholder')}
-                    className={`form-input ${
-                      errors.username && touched.username ? 'input-error' : ''
-                    }`}
-                  />
-                  <ErrorMessage
-                    name="username"
-                    component="div"
-                    className="error-message"
-                  />
-                </div>
+                <Col md={6}>
+                  <Form onSubmit={formik.handleSubmit}>
+                    <h1 className="text-center mb-4">{t('auth.signup.title')}</h1>
 
-                <div className="form-group">
-                  <label htmlFor="password">{t('auth.signup.password')}</label>
-                  <Field
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder={t('auth.signup.passwordPlaceholder')}
-                    className={`form-input ${
-                      errors.password && touched.password ? 'input-error' : ''
-                    }`}
-                  />
-                  <ErrorMessage
-                    name="password"
-                    component="div"
-                    className="error-message"
-                  />
-                </div>
+                    <FloatingLabel
+                      controlId="username"
+                      label={t('auth.signup.username')}
+                      className="mb-3"
+                    >
+                      <Form.Control
+                        ref={inputRef}
+                        type="text"
+                        name="username"
+                        placeholder={t('auth.signup.username')}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        value={formik.values.username}
+                        isInvalid={
+                          (formik.touched.username && !!formik.errors.username) || registrationError
+                        }
+                        autoComplete="username"
+                      />
+                      <Form.Control.Feedback type="invalid" tooltip placement="right">
+                        {registrationError 
+                            ? t('auth.validation.userAlreadyExists') 
+                            : formik.errors.username}
+                      </Form.Control.Feedback>
+                    </FloatingLabel>
 
-                <div className="form-group">
-                  <label htmlFor="passwordConfirm">
-                    {t('auth.signup.passwordConfirm')}
-                  </label>
-                  <Field
-                    type="password"
-                    id="passwordConfirm"
-                    name="passwordConfirm"
-                    placeholder={t('auth.signup.passwordConfirmPlaceholder')}
-                    className={`form-input ${
-                      errors.passwordConfirm && touched.passwordConfirm
-                        ? 'input-error'
-                        : ''
-                    }`}
-                  />
-                  <ErrorMessage
-                    name="passwordConfirm"
-                    component="div"
-                    className="error-message"
-                  />
-                </div>
+                    <FloatingLabel
+                      controlId="password"
+                      label={t('auth.signup.password')}
+                      className="mb-3"
+                    >
+                      <Form.Control
+                        type="password"
+                        name="password"
+                        placeholder={t('auth.signup.password')}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        value={formik.values.password}
+                        isInvalid={formik.touched.password && !!formik.errors.password}
+                        autoComplete="new-password"
+                      />
+                      <Form.Control.Feedback type="invalid" tooltip>
+                        {formik.errors.password}
+                      </Form.Control.Feedback>
+                    </FloatingLabel>
 
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="submit-button"
-                >
-                  {isSubmitting ? t('common.loading') : t('auth.signup.button')}
-                </button>
-              </Form>
-            )}
-          </Formik>
+                    <FloatingLabel
+                      controlId="confirmPassword"
+                      label={t('auth.signup.passwordConfirm')}
+                      className="mb-4"
+                    >
+                      <Form.Control
+                        type="password"
+                        name="confirmPassword"
+                        placeholder={t('auth.signup.passwordConfirm')}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        value={formik.values.confirmPassword}
+                        isInvalid={formik.touched.confirmPassword && !!formik.errors.confirmPassword}
+                        autoComplete="new-password"
+                      />
+                      <Form.Control.Feedback type="invalid" tooltip>
+                        {formik.errors.confirmPassword}
+                      </Form.Control.Feedback>
+                    </FloatingLabel>
 
-          <div className="signup-footer">
-            <p>
-              {t('auth.signup.hasAccount')}{' '}
-              <Link to="/login" className="signup-link">
-                {t('auth.signup.login')}
-              </Link>
-            </p>
-          </div>
-        </div>
-      </div>
-    </>
+                    <Button 
+                        type="submit" 
+                        variant="outline-primary" 
+                        className="w-100 mb-3"
+                        disabled={formik.isSubmitting}
+                    >
+                      {t('auth.signup.button')}
+                    </Button>
+                  </Form>
+                </Col>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+    </div>
   );
 }
 

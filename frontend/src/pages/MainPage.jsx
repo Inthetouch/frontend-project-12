@@ -35,18 +35,23 @@ import MessageForm from '../components/MessageForm';
 import AddChannelModal from '../components/AddChannelModal';
 import RenameChannelModal from '../components/RenameChannelModal';
 import DeleteChannelModal from '../components/DeleteChannelModal';
+import { Container, Row, Col, Spinner } from 'react-bootstrap';
 
 const MainPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { loading, error, socketConnected} = useSelector((state) => state.chat);
+  
+  const { loading, socketConnected, channels, currentChannelId, messages } = useSelector((state) => state.chat);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showRenameModal, setShowRenameModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedChannel, setSelectedChannel] = useState(null);
   const wasConnected = useRef(false);
+
+  const currentChannel = channels.find((c) => c.id === currentChannelId);
+  const currentMessagesCount = messages[currentChannelId]?.length || 0;
 
   const handlersRef = useRef({ 
     handleNewMessage: null, 
@@ -83,7 +88,6 @@ const MainPage = () => {
         logInfo('WebSocket initialized');
 
         const handleNewMessage = (message) => {
-          console.log('New message received:', message);
           dispatch(addMessageFromSocket({ channelId: message.channelId, message }));
         };
 
@@ -98,19 +102,16 @@ const MainPage = () => {
         };
         
         const handleNewChannel = (channel) => {
-          console.log('New channel received:', channel);
           dispatch(addChannelFromSocket(channel));
           logInfo('New channel added', { channel: channel.name });
         };
 
         const handleRenameChannel = (channel) => {
-          console.log('Channel renamed:', channel);
           dispatch(updateChannelFromSocket(channel));
           logInfo('Channel renamed', { channel: channel.name });
         };
 
         const handleRemoveChannel = (data) => {
-          console.log('Channel removed:', data);
           dispatch(removeChannelFromSocket(data));
           logInfo('Channel removed', { channelId: data.id });
         };
@@ -178,77 +179,76 @@ const MainPage = () => {
     logInfo('Delete channel modal opened', { channel: channel.name });
   };
 
-  const handleLogout = () => {
-    disconnectSocket();
-    logout();
-    showSuccessToast('toast.auth.logoutSuccess')
-    navigate('/login');
-  };
+  if (loading) {
+    return (
+      <div className="h-100 d-flex justify-content-center align-items-center">
+        <Spinner animation="border" variant="primary" role="status">
+          <span className="visually-hidden">{t('chat.main.loading')}</span>
+        </Spinner>
+      </div>
+    );
+  }
 
   return (
-    <>
-      <Header />
-      <div className="chat-page">
-        <header className="chat-header">
-          <h1>{t('chat.main.title')}</h1>
-          <div className='header-status'>
-            <span className={`socket-status ${socketConnected ? 'connected' : 'disconnected'}`}>
-              {socketConnected ? t('chat.main.connected') : t('chat.main.disconnected')}
-            </span>
-            <button onClick={handleLogout} className="logout-button">
-              {t('common.logout')}
-            </button>
-          </div>
-        </header>
-
-        {error && (
-          <div className='chat-error'>
-            <p>{t('common.error')}: {error}</p>
-          </div>
-        )}
-
-        {loading ? (
-          <div className='chat-loading'>
-            <p>{t('chat.main.loading')}</p>
-          </div>
-        ) : (
-          <div className="chat-container">
+    <div className="d-flex flex-column h-100">
+      <Header /> 
+      
+      <Container className="h-100 my-4 overflow-hidden rounded shadow">
+        <Row className="h-100 bg-white flex-md-row">
+        
+          <Col md={2} className="col-4 border-end px-0 bg-light flex-column h-100 d-flex">
             <ChannelList
               onAddChannel={() => setShowAddModal(true)}
               onRenameChannel={handleRenameClick}
               onDeleteChannel={handleDeleteClick}
             />
-            <main className="chat-main">
+          </Col>
+
+          <Col className="p-0 h-100">
+            <div className="d-flex flex-column h-100">
+            
+              <div className="bg-light mb-4 p-3 shadow-sm small">
+                <p className="m-0">
+                  <b># {currentChannel ? currentChannel.name : '...'}</b>
+                </p>
+                <span className="text-muted">
+                  {t('chat.messages.count', { count: currentMessagesCount, defaultValue: `${currentMessagesCount} сообщений` })}
+                </span>
+              </div>
+
               <MessageList />
-              <MessageForm />
-            </main>
-          </div>
-        )}
 
-        <AddChannelModal
-          isOpen={showAddModal}
-          onClose={() => setShowAddModal(false)}
-        />
+              <div className="mt-auto px-5 py-3">
+                <MessageForm />
+              </div>
+            </div>
+          </Col>
+        </Row>
+      </Container>
 
-        <RenameChannelModal
-          isOpen={showRenameModal}
-          onClose={() => {
-            setShowRenameModal(false);
-            setSelectedChannel(null);
-          }}
-          channel={selectedChannel}
-        />
+      <AddChannelModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+      />
 
-        <DeleteChannelModal
-          isOpen={showDeleteModal}
-          onClose={() => {
-            setShowDeleteModal(false);
-            setSelectedChannel(null);
-          }}
-          channel={selectedChannel}
-        />
-      </div>
-    </>
+      <RenameChannelModal
+        isOpen={showRenameModal}
+        onClose={() => {
+          setShowRenameModal(false);
+          setSelectedChannel(null);
+        }}
+        channel={selectedChannel}
+      />
+
+      <DeleteChannelModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setSelectedChannel(null);
+        }}
+        channel={selectedChannel}
+      />
+    </div>
   );
 };
 
