@@ -10,9 +10,15 @@ export const initializeRollbar = (environment = 'development') => {
       enabled: true,
       captureUncaught: true,
       captureUnhandledRejections: true,
+      hostSafeList: ['localhost'],
       payload: {
         environment: environment,
-        platform: navigator.userAgent,
+        client: {
+          javascript: {
+            source_map_enabled: true,
+            code_version: '1.0.0',
+          },
+        },
       },
       ignoredMessages: [
         'Script error',
@@ -29,7 +35,25 @@ export const initializeRollbar = (environment = 'development') => {
 export const captureMessage = (message, level = 'info', extra = {}) => {
   try {
     if (window.Rollbar) {
-      window.Rollbar.log(level, message, extra);
+      switch (level) {
+        case 'critical':
+          window.Rollbar.critical(message, extra);
+          break;
+        case 'error':
+          window.Rollbar.error(message, extra);
+          break;
+        case 'warning':
+          window.Rollbar.warning(message, extra);
+          break;
+        case 'info':
+          window.Rollbar.info(message, extra);
+          break;
+        case 'debug':
+          window.Rollbar.debug(message, extra);
+          break;
+        default:
+          window.Rollbar.info(message, extra);
+      }
     } else {
       console.log(`[Rollbar - ${level.toUpperCase()}]`, message, extra);
     }
