@@ -48,7 +48,7 @@ function ChannelList({ onAddChannel, onRenameChannel, onDeleteChannel }) {
                   variant={channel.id === currentChannelId ? "secondary" : "light"} 
                   className="flex-grow-0 border-start-0" 
                 >
-                  <span className="visually-hidden">Управление каналом</span>
+                  <span className="visually-hidden">{t('chat.channels.manage')}</span>
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu>

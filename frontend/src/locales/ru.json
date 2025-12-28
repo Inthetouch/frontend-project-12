@@ -25,7 +25,7 @@
     "message": {
       "sent": "Сообщение отправлено",
       "sendError": "Ошибка отправки сообщения",
-      "connectionError": "Нет подключения к серверу"
+      "connectionError": "Ошибка соединения"
     },
     "auth": {
       "loginSuccess": "Добро пожаловать!",
@@ -37,7 +37,7 @@
     "network": {
       "offline": "Сеть недоступна",
       "online": "Сеть восстановлена",
-      "connectionLost": "Подключение потеряно"
+      "connectionLost": "Ошибка соединения"
     }
   },
   "auth": {
@@ -49,7 +49,7 @@
       "passwordPlaceholder": "Введите пароль",
       "button": "Войти",
       "noAccount": "Нет аккаунта?",
-      "signup": "Регистрация",
+      "signup": "Зарегистрироваться",
       "testCredentials": "Для тестирования используйте:",
       "testLogin": "Логин:",
       "testPassword": "Пароль:"
@@ -67,16 +67,15 @@
       "login": "Войти"
     },
     "validation": {
-      "usernameTooShort": "Имя должно содержать минимум 3 символа",
-      "usernameTooLong": "Имя не должно превышать 20 символов",
-      "usernameRequired": "Имя пользователя обязательно",
-      "passwordTooShort": "Пароль должен содержать минимум 6 символов",
-      "passwordRequired": "Пароль обязателен",
-      "passwordConfirmRequired": "Подтверждение пароля обязательно",
+      "usernameTooShort": "От 3 до 20 символов",
+      "usernameTooLong": "От 3 до 20 символов",
+      "usernameRequired": "Обязательное поле",
+      "passwordTooShort": "Не менее 6 символов",
+      "passwordRequired": "Обязательное поле",
       "passwordMismatch": "Пароли должны совпадать",
       "userAlreadyExists": "Такой пользователь уже существует",
-      "authError": "Ошибка авторизации. Попробуйте позже.",
-      "signupError": "Ошибка регистрации. Попробуйте позже."
+      "authError": "Неверные имя пользователя или пароль",
+      "signupError": "Ошибка регистрации"
     }
   },
   "chat": {
@@ -88,8 +87,9 @@
     },
     "channels": {
       "title": "Каналы",
-      "addChannel": "Добавить канал",
-      "general": "General"
+      "addChannel": "+",
+      "general": "General",
+      "manage": "Управление каналом"
     },
     "channelModal": {
       "add": {
@@ -99,22 +99,23 @@
         "button": "Отправить",
         "creating": "Создание...",
         "validation": {
-          "nameTooShort": "Имя канала должно быть от 3 символов",
-          "nameTooLong": "Имя канала не должно превышать 20 символов",
-          "nameRequired": "Имя канала обязательно",
+          "nameTooShort": "От 3 до 20 символов",
+          "nameTooLong": "От 3 до 20 символов",
+          "nameRequired": "Обязательное поле",
           "nameDuplicate": "Должно быть уникальным",
           "profanity": "Имя канала содержит недопустимые слова"
         }
       },
       "rename": {
         "title": "Переименовать канал",
-        "name": "Новое имя канала",
+        "name": "Имя канала",
+        "namePlaceholder": "Введите новое имя канала",
         "button": "Отправить",
         "saving": "Сохранение...",
         "validation": {
-          "nameTooShort": "Имя канала должно быть от 3 символов",
-          "nameTooLong": "Имя канала не должно превышать 20 символов",
-          "nameRequired": "Имя канала обязательно",
+          "nameTooShort": "От 3 до 20 символов",
+          "nameTooLong": "От 3 до 20 символов",
+          "nameRequired": "Обязательное поле",
           "nameDuplicate": "Должно быть уникальным",
           "profanity": "Имя канала содержит недопустимые слова"
         }
@@ -122,13 +123,20 @@
       "delete": {
         "title": "Удалить канал",
         "message": "Уверены?",
-        "warning": "Это действие необратимо. Все сообщения в этом канале будут удалены.",
+        "warning": "Это действие необратимо.",
         "button": "Удалить",
         "deleting": "Удаление...",
         "menu": "Удалить"
       }
     },
+    "messageForm": {
+       "label": "Новое сообщение",
+       "placeholder": "Введите сообщение..."
+    },
     "messages": {
+      "count_one": "{{count}} сообщение",
+      "count_few": "{{count}} сообщения",
+      "count_many": "{{count}} сообщений",
       "empty": "Нет сообщений. Начните беседу!",
       "placeholder": "Введите сообщение...",
       "send": "Отправить",
@@ -137,7 +145,7 @@
         "empty": "Сообщение не может быть пустым"
       },
       "errors": {
-        "connectionLost": "Нет подключения к серверу. Попробуйте позже.",
+        "connectionLost": "Ошибка соединения",
         "sendError": "Ошибка отправки сообщения"
       }
     },
@@ -146,7 +154,7 @@
       "delete": "Удалить"
     },
     "errors": {
-      "connectionError": "Ошибка подключения к серверу"
+      "connectionError": "Ошибка соединения"
     }
   },
   "notFound": {
