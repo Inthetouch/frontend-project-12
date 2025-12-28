@@ -49,7 +49,7 @@
       "passwordPlaceholder": "Введите пароль",
       "button": "Войти",
       "noAccount": "Нет аккаунта?",
-      "signup": "Зарегистрироваться",
+      "signup": "Регистрация",
       "testCredentials": "Для тестирования используйте:",
       "testLogin": "Логин:",
       "testPassword": "Пароль:"
