@@ -25,7 +25,7 @@ function SignupPage() {
     .trim()
     .required(t('auth.validation.passwordRequired'))
     .min(6, t('auth.validation.passwordTooShort')),
-  passwordConfirm: Yup.string()
+  confirmPassword: Yup.string()
     .test('password-match', t('auth.validation.passwordMismatch'), function(value) {
         return this.parent.password === value;
       }),
