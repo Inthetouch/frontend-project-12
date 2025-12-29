@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import * as Yup from "yup";
 import { login } from "../services/authService.js";
-import { showSuccessToast, showErrorToast } from '../utils/toastService';
+import { showSuccessToast } from '../utils/toastService';
 import { setRollbarUser } from '../config/rollbar';
 import { logInfo, logError } from '../utils/errorLogger';
 import Header from '../components/Header.jsx';
@@ -20,13 +20,10 @@ function LoginPage() {
   const validationSchema = Yup.object().shape({
   username: Yup.string()
     .trim()
-    .required(t('auth.validation.usernameRequired'))
-    .min(3, t('auth.validation.usernameTooShort'))
-    .max(20, t('auth.validation.usernameTooLong')),
+    .required(t('auth.validation.usernameRequired')),
   password: Yup.string()
     .trim()
-    .required(t('auth.validation.passwordRequired'))
-    .min(5, t('auth.validation.passwordTooShort')),
+    .required(t('auth.validation.passwordRequired')),
   });
 
   const formik = useFormik({
