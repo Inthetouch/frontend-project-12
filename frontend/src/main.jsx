@@ -8,7 +8,6 @@ import App from './App.jsx'
 import store from './store/index.js'
 import { setupAxiosInterceptors } from './services/authService.js'
 import { initializeI18n } from './i18n/config.js';
-import { initializeProfanityFilter } from './utils/profanityFilter.js';
 import { initializeRollbar } from './config/rollbar.js';
 import { logInfo } from './utils/errorLogger.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -23,9 +22,6 @@ const initializeApp = async () => {
 
     const i18n = await initializeI18n();
     logInfo('i18n initialized');
-
-    await initializeProfanityFilter();
-    logInfo('Profanity filter initialized');
 
     setupAxiosInterceptors();
 
