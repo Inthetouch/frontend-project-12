@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import * as Yup from 'yup';
 import { createChannel } from '../store/chatSlice';
 import { showSuccessToast, showErrorToast } from '../utils/toastService';
-import { cleanProfanity, isProfane } from '../utils/profanityFilter';
+import { cleanProfanity } from '../utils/profanityFilter';
 
 function AddChannelModal({ isOpen, onClose }) {
   const { t } = useTranslation();

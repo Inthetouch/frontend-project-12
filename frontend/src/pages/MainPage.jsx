@@ -26,7 +26,7 @@ import {
   onRemoveChannel,
   offRemoveChannel,
 } from '../services/socketService';
-import { showErrorToast, showInfoToast, showSuccessToast } from '../utils/toastService';
+import { showErrorToast, showInfoToast } from '../utils/toastService';
 import { logError, logWarning, logInfo } from '../utils/errorLogger';
 import Header from '../components/Header';
 import ChannelList from '../components/ChannelList';

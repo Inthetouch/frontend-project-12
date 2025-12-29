@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import * as yup from 'yup';
 import { renameChannel } from '../store/chatSlice';
 import { showSuccessToast, showErrorToast } from '../utils/toastService';
-import { cleanProfanity, isProfane } from '../utils/profanityFilter';
+import { cleanProfanity } from '../utils/profanityFilter';
 
 const RenameChannelModal = ({ isOpen, onClose, channel }) => {
   const { t } = useTranslation();
