@@ -47,9 +47,6 @@ function LoginPage() {
         setAuthFailed(true);
         inputRef.current?.select();
         logError(error, { username: values.username, type: 'login_error' });
-        if (!error.isAxiosError || error.response?.status !== 401) {
-            showErrorToast('toast.auth.loginError');
-        }
       }
     },
   });
