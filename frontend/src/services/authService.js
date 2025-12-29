@@ -49,14 +49,7 @@ export const signup = async (username, password) => {
     return token;
   } catch (error) {
     logError(error, { username, type: 'signup_error' });
-    
-    if (error.response?.status === 409) {
-      throw new Error('Пользователь с таким именем уже существует');
-    }
-
-    const message =
-      error.response?.data?.message || 'Ошибка регистрации. Попробуйте позже.';
-    throw new Error(message);
+    throw error;
   }
 };
 

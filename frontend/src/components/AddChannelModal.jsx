@@ -26,9 +26,6 @@ function AddChannelModal({ isOpen, onClose }) {
         (ch) => ch.name.toLowerCase() === value?.toLowerCase()
       );
     })
-    .test('profanity', t('chat.channelModal.add.validation.profanity'), (value) => {
-        return !isProfane(value);
-      }),
   });
 
   const formik = useFormik({

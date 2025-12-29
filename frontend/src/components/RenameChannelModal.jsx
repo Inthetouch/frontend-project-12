@@ -26,9 +26,6 @@ const RenameChannelModal = ({ isOpen, onClose, channel }) => {
           (ch) => ch.name.toLowerCase() === value.toLowerCase()
         );
       })
-      .test('profanity', t('chat.channelModal.rename.validation.profanity'), (value) => {
-        return !isProfane(value);
-      }),
   });
 
   const formik = useFormik({
