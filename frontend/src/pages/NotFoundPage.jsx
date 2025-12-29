@@ -1,9 +1,9 @@
-import { Link } from 'react-router-dom';
-import Header from '../components/Header';
-import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom'
+import Header from '../components/Header'
+import { useTranslation } from 'react-i18next'
 
 const NotFoundPage = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation()
   return (
     <>
       <Header />
@@ -17,7 +17,7 @@ const NotFoundPage = () => {
         </nav>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default NotFoundPage;
+export default NotFoundPage

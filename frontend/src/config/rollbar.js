@@ -1,7 +1,7 @@
-import Rollbar from 'rollbar';
+import Rollbar from 'rollbar'
 
 export const initializeRollbar = (environment = 'development') => {
-  const rollbarToken = import.meta.env.VITE_ROLLBAR_TOKEN;
+  const rollbarToken = import.meta.env.VITE_ROLLBAR_TOKEN
 
   if (rollbarToken) {
     window.Rollbar = new Rollbar({
@@ -24,55 +24,60 @@ export const initializeRollbar = (environment = 'development') => {
         'Script error',
         'Non-Error promise rejection captured',
       ],
-    });
-    console.log('✅ Rollbar initialized for', environment);
-  } else {
-    console.log('⚠️ Rollbar disabled (no VITE_ROLLBAR_TOKEN)')
-    window.Rollbar = null;
+    })
+    console.log('✅ Rollbar initialized for', environment)
   }
-};
+  else {
+    console.log('⚠️ Rollbar disabled (no VITE_ROLLBAR_TOKEN)')
+    window.Rollbar = null
+  }
+}
 
 export const captureMessage = (message, level = 'info', extra = {}) => {
   try {
     if (window.Rollbar) {
       switch (level) {
         case 'critical':
-          window.Rollbar.critical(message, extra);
-          break;
+          window.Rollbar.critical(message, extra)
+          break
         case 'error':
-          window.Rollbar.error(message, extra);
-          break;
+          window.Rollbar.error(message, extra)
+          break
         case 'warning':
-          window.Rollbar.warning(message, extra);
-          break;
+          window.Rollbar.warning(message, extra)
+          break
         case 'info':
-          window.Rollbar.info(message, extra);
-          break;
+          window.Rollbar.info(message, extra)
+          break
         case 'debug':
-          window.Rollbar.debug(message, extra);
-          break;
+          window.Rollbar.debug(message, extra)
+          break
         default:
-          window.Rollbar.info(message, extra);
+          window.Rollbar.info(message, extra)
       }
-    } else {
-      console.log(`[Rollbar - ${level.toUpperCase()}]`, message, extra);
     }
-  } catch (error) {
-    console.error('[Rollbar captureMessage error]', error);
+    else {
+      console.log(`[Rollbar - ${level.toUpperCase()}]`, message, extra)
+    }
   }
-};
+  catch (error) {
+    console.error('[Rollbar captureMessage error]', error)
+  }
+}
 
 export const captureException = (error, context = {}) => {
   try {
     if (window.Rollbar) {
-      window.Rollbar.error(error, context);
-    } else {
-      console.error('[Rollbar ERROR]', error, context);
+      window.Rollbar.error(error, context)
     }
-  } catch (err) {
-    console.error('[Rollbar captureException error]', err);
+    else {
+      console.error('[Rollbar ERROR]', error, context)
+    }
   }
-};
+  catch (err) {
+    console.error('[Rollbar captureException error]', err)
+  }
+}
 
 export const setRollbarUser = (userId, username, email = null) => {
   try {
@@ -85,13 +90,14 @@ export const setRollbarUser = (userId, username, email = null) => {
             email: email,
           },
         },
-      });
-      console.log('✅ Rollbar user set:', username);
+      })
+      console.log('✅ Rollbar user set:', username)
     }
-  } catch (error) {
-    console.error('[Rollbar setRollbarUser error]', error);
   }
-};
+  catch (error) {
+    console.error('[Rollbar setRollbarUser error]', error)
+  }
+}
 
 export const clearRollbarUser = () => {
   try {
@@ -100,12 +106,13 @@ export const clearRollbarUser = () => {
         payload: {
           person: null,
         },
-      });
-      console.log('✅ Rollbar user cleared');
+      })
+      console.log('✅ Rollbar user cleared')
     }
-  } catch (error) {
-    console.error('[Rollbar clearRollbarUser error]', error);
   }
-};
+  catch (error) {
+    console.error('[Rollbar clearRollbarUser error]', error)
+  }
+}
 
-export default window.Rollbar;
+export default window.Rollbar

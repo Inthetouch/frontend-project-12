@@ -1,5 +1,5 @@
-import { toast } from 'react-toastify';
-import i18next from 'i18next';
+import { toast } from 'react-toastify'
+import i18next from 'i18next'
 
 export const showSuccessToast = (messageKey) => {
   toast.success(i18next.t(messageKey), {
@@ -9,8 +9,8 @@ export const showSuccessToast = (messageKey) => {
     closeOnClick: true,
     pauseOnHover: true,
     draggable: true,
-  });
-};
+  })
+}
 
 export const showErrorToast = (messageKey) => {
   toast.error(i18next.t(messageKey), {
@@ -20,8 +20,8 @@ export const showErrorToast = (messageKey) => {
     closeOnClick: true,
     pauseOnHover: true,
     draggable: true,
-  });
-};
+  })
+}
 
 export const showInfoToast = (messageKey) => {
   toast.info(i18next.t(messageKey), {
@@ -31,8 +31,8 @@ export const showInfoToast = (messageKey) => {
     closeOnClick: true,
     pauseOnHover: true,
     draggable: true,
-  });
-};
+  })
+}
 
 export const showWarningToast = (messageKey) => {
   toast.warning(i18next.t(messageKey), {
@@ -42,5 +42,5 @@ export const showWarningToast = (messageKey) => {
     closeOnClick: true,
     pauseOnHover: true,
     draggable: true,
-  });
-};
+  })
+}

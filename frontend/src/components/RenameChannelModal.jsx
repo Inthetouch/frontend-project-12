@@ -1,18 +1,18 @@
-import { useEffect, useRef } from 'react';
-import { useFormik } from 'formik';
-import { Modal, Button, Form } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
-import { useTranslation } from 'react-i18next';
-import * as yup from 'yup';
-import { renameChannel } from '../store/chatSlice';
-import { showSuccessToast, showErrorToast } from '../utils/toastService';
-import { cleanProfanity } from '../utils/profanityFilter';
+import { useEffect, useRef } from 'react'
+import { useFormik } from 'formik'
+import { Modal, Button, Form } from 'react-bootstrap'
+import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
+import * as yup from 'yup'
+import { renameChannel } from '../store/chatSlice'
+import { showSuccessToast, showErrorToast } from '../utils/toastService'
+import { cleanProfanity } from '../utils/profanityFilter'
 
 const RenameChannelModal = ({ isOpen, onClose, channel }) => {
-  const { t } = useTranslation();
-  const dispatch = useDispatch();
-  const { channels } = useSelector((state) => state.chat);
-  const inputRef = useRef(null);
+  const { t } = useTranslation()
+  const dispatch = useDispatch()
+  const { channels } = useSelector(state => state.chat)
+  const inputRef = useRef(null)
 
   const validationSchema = yup.object({
     name: yup.string()
@@ -21,12 +21,12 @@ const RenameChannelModal = ({ isOpen, onClose, channel }) => {
       .min(3, t('chat.channelModal.rename.validation.nameTooShort'))
       .max(20, t('chat.channelModal.rename.validation.nameTooLong'))
       .test('unique', t('chat.channelModal.rename.validation.nameDuplicate'), (value) => {
-        if (!value || !channel) return true;
+        if (!value || !channel) return true
         return !channels.some(
-          (ch) => ch.name.toLowerCase() === value.toLowerCase()
-        );
-      })
-  });
+          ch => ch.name.toLowerCase() === value.toLowerCase(),
+        )
+      }),
+  })
 
   const formik = useFormik({
     initialValues: {
@@ -36,28 +36,30 @@ const RenameChannelModal = ({ isOpen, onClose, channel }) => {
     enableReinitialize: true,
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        const cleanedName = cleanProfanity(values.name);
+        const cleanedName = cleanProfanity(values.name)
         await dispatch(
-          renameChannel({ channelId: channel.id, name: cleanedName })
-        ).unwrap();
-        
-        showSuccessToast('toast.channel.renamed');
-        onClose();
-      } catch (error) {
-        console.error('Failed to rename channel:', error);
-        showErrorToast('toast.channel.renameError');
-        inputRef.current?.select();
-      } finally {
-        setSubmitting(false);
+          renameChannel({ channelId: channel.id, name: cleanedName }),
+        ).unwrap()
+
+        showSuccessToast('toast.channel.renamed')
+        onClose()
+      }
+      catch (error) {
+        console.error('Failed to rename channel:', error)
+        showErrorToast('toast.channel.renameError')
+        inputRef.current?.select()
+      }
+      finally {
+        setSubmitting(false)
       }
     },
-  });
+  })
 
   useEffect(() => {
     if (isOpen && inputRef.current) {
-      inputRef.current.select();
+      inputRef.current.select()
     }
-  }, [isOpen]);
+  }, [isOpen])
 
   return (
     <Modal show={isOpen} onHide={onClose} centered>
@@ -73,7 +75,7 @@ const RenameChannelModal = ({ isOpen, onClose, channel }) => {
               ref={inputRef}
               type="text"
               name="name"
-              placeholder={t('chat.channelModal.rename.namePlaceholder') || "Новое имя канала"}
+              placeholder={t('chat.channelModal.rename.namePlaceholder') || 'Новое имя канала'}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               value={formik.values.name}
@@ -85,19 +87,19 @@ const RenameChannelModal = ({ isOpen, onClose, channel }) => {
               {formik.errors.name}
             </Form.Control.Feedback>
           </Form.Group>
-          
+
           <div className="d-flex justify-content-end mt-3 gap-2">
-            <Button 
-                variant="secondary" 
-                onClick={onClose} 
-                disabled={formik.isSubmitting}
+            <Button
+              variant="secondary"
+              onClick={onClose}
+              disabled={formik.isSubmitting}
             >
               {t('common.cancel')}
             </Button>
-            <Button 
-                type="submit" 
-                variant="primary" 
-                disabled={formik.isSubmitting}
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={formik.isSubmitting}
             >
               {formik.isSubmitting ? t('common.loading') : t('common.send')}
             </Button>
@@ -105,7 +107,7 @@ const RenameChannelModal = ({ isOpen, onClose, channel }) => {
         </Form>
       </Modal.Body>
     </Modal>
-  );
-};
+  )
+}
 
-export default RenameChannelModal;
+export default RenameChannelModal

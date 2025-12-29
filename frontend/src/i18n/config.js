@@ -1,6 +1,6 @@
-import i18next from 'i18next';
-import { initReactI18next } from 'react-i18next';
-import ru from '../locales/ru.json';
+import i18next from 'i18next'
+import { initReactI18next } from 'react-i18next'
+import ru from '../locales/ru.json'
 
 export const initializeI18n = async () => {
   await i18next
@@ -21,8 +21,8 @@ export const initializeI18n = async () => {
       react: {
         useSuspense: false,
       },
-    });
-  return i18next;
-};
+    })
+  return i18next
+}
 
-export default i18next;
+export default i18next

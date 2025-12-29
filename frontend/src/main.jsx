@@ -1,29 +1,28 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { Provider } from 'react-redux'
-import { I18nextProvider } from 'react-i18next';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { I18nextProvider } from 'react-i18next'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import App from './App.jsx'
 import store from './store/index.js'
 import { setupAxiosInterceptors } from './services/authService.js'
-import { initializeI18n } from './i18n/config.js';
-import { initializeRollbar } from './config/rollbar.js';
-import { logInfo } from './utils/errorLogger.js';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { initializeI18n } from './i18n/config.js'
+import { initializeRollbar } from './config/rollbar.js'
+import { logInfo } from './utils/errorLogger.js'
+import 'bootstrap/dist/css/bootstrap.min.css'
 import './index.css'
 
 const initializeApp = async () => {
   try {
+    const environment = import.meta.env.MODE || 'development'
+    initializeRollbar(environment)
+    logInfo('App initialization started', { environment })
 
-    const environment = import.meta.env.MODE || 'development';
-    initializeRollbar(environment);
-    logInfo('App initialization started', { environment });
+    const i18n = await initializeI18n()
+    logInfo('i18n initialized')
 
-    const i18n = await initializeI18n();
-    logInfo('i18n initialized');
-
-    setupAxiosInterceptors();
+    setupAxiosInterceptors()
 
     ReactDOM.createRoot(document.getElementById('root')).render(
       <React.StrictMode>
@@ -45,15 +44,16 @@ const initializeApp = async () => {
           </I18nextProvider>
         </Provider>
       </React.StrictMode>,
-    );
+    )
 
-    logInfo('App mounted successfully');
-  } catch (error) {
-    console.error('Failed to initialize app:', error);
+    logInfo('App mounted successfully')
+  }
+  catch (error) {
+    console.error('Failed to initialize app:', error)
     if (window.Rollbar) {
-      window.Rollbar.critical('App initialization failed', error);
+      window.Rollbar.critical('App initialization failed', error)
     }
   }
-};
+}
 
-initializeApp();
+initializeApp()

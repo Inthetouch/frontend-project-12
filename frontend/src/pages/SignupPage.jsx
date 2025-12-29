@@ -1,35 +1,35 @@
-import { useEffect, useRef, useState } from 'react';
-import { useFormik } from 'formik';
-import { Button, Form, Card, Container, Row, Col, FloatingLabel } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import * as Yup from 'yup';
-import { signup } from '../services/authService.js';
-import Header from '../components/Header';
-import { showSuccessToast, showErrorToast } from '../utils/toastService';
-import avatarImage from '../assets/avatar_2.jpg';
+import { useEffect, useRef, useState } from 'react'
+import { useFormik } from 'formik'
+import { Button, Form, Card, Container, Row, Col, FloatingLabel } from 'react-bootstrap'
+import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import * as Yup from 'yup'
+import { signup } from '../services/authService.js'
+import Header from '../components/Header'
+import { showSuccessToast, showErrorToast } from '../utils/toastService'
+import avatarImage from '../assets/avatar_2.jpg'
 
 function SignupPage() {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  const inputRef = useRef(null);
-  const [registrationError, setRegistrationError] = useState(false);
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const inputRef = useRef(null)
+  const [registrationError, setRegistrationError] = useState(false)
 
   const validationSchema = Yup.object().shape({
-  username: Yup.string()
-    .trim()
-    .required(t('auth.validation.usernameRequired'))
-    .min(3,  t('auth.validation.usernameTooShort'))
-    .max(20, t('auth.validation.usernameTooLong')),
-  password: Yup.string()
-    .trim()
-    .required(t('auth.validation.passwordRequired'))
-    .min(6, t('auth.validation.passwordTooShort')),
-  confirmPassword: Yup.string()
-    .test('password-match', t('auth.validation.passwordMismatch'), function(value) {
-        return this.parent.password === value;
+    username: Yup.string()
+      .trim()
+      .required(t('auth.validation.usernameRequired'))
+      .min(3, t('auth.validation.usernameTooShort'))
+      .max(20, t('auth.validation.usernameTooLong')),
+    password: Yup.string()
+      .trim()
+      .required(t('auth.validation.passwordRequired'))
+      .min(6, t('auth.validation.passwordTooShort')),
+    confirmPassword: Yup.string()
+      .test('password-match', t('auth.validation.passwordMismatch'), function (value) {
+        return this.parent.password === value
       }),
-  });
+  })
 
   const formik = useFormik({
     initialValues: {
@@ -39,26 +39,28 @@ function SignupPage() {
     },
     validationSchema,
     onSubmit: async (values) => {
-      setRegistrationError(false);
+      setRegistrationError(false)
       try {
-        await signup(values.username, values.password);
-        showSuccessToast(t('toast.auth.signupSuccess'));
-        navigate('/');
-      } catch (err) {
-        console.error(err);
+        await signup(values.username, values.password)
+        showSuccessToast(t('toast.auth.signupSuccess'))
+        navigate('/')
+      }
+      catch (err) {
+        console.error(err)
         if (err.response && err.response.status === 409) {
-          setRegistrationError(true);
-          inputRef.current?.select();
-        } else {
-          showErrorToast(t('toast.auth.signupError'));
+          setRegistrationError(true)
+          inputRef.current?.select()
+        }
+        else {
+          showErrorToast(t('toast.auth.signupError'))
         }
       }
     },
-  });
+  })
 
   useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+    inputRef.current?.focus()
+  }, [])
 
   return (
     <div className="d-flex flex-column h-100 bg-light">
@@ -101,9 +103,9 @@ function SignupPage() {
                         autoComplete="username"
                       />
                       <Form.Control.Feedback type="invalid" tooltip placement="right">
-                        {registrationError 
-                            ? t('auth.validation.userAlreadyExists') 
-                            : formik.errors.username}
+                        {registrationError
+                          ? t('auth.validation.userAlreadyExists')
+                          : formik.errors.username}
                       </Form.Control.Feedback>
                     </FloatingLabel>
 
@@ -147,11 +149,11 @@ function SignupPage() {
                       </Form.Control.Feedback>
                     </FloatingLabel>
 
-                    <Button 
-                        type="submit" 
-                        variant="outline-primary" 
-                        className="w-100 mb-3"
-                        disabled={formik.isSubmitting}
+                    <Button
+                      type="submit"
+                      variant="outline-primary"
+                      className="w-100 mb-3"
+                      disabled={formik.isSubmitting}
                     >
                       {t('auth.signup.button')}
                     </Button>
@@ -163,7 +165,7 @@ function SignupPage() {
         </Row>
       </Container>
     </div>
-  );
+  )
 }
 
-export default SignupPage;
+export default SignupPage

@@ -3,13 +3,13 @@ import MainPage from './pages/MainPage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import NotFoundPage from './pages/NotFoundPage'
-import ProtectedRoute from './components/protectedRoute';
+import ProtectedRoute from './components/protectedRoute'
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<ProtectedRoute element={<MainPage />}/>}/>
+        <Route path="/" element={<ProtectedRoute element={<MainPage />} />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="*" element={<NotFoundPage />} />

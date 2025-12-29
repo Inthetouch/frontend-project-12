@@ -1,68 +1,73 @@
-import axios from 'axios';
+import axios from 'axios'
 
-const API_BASE_URL = '/api/v1';
+const API_BASE_URL = '/api/v1'
 
 export const fetchChatData = async () => {
   try {
     const [channelsResponse, messagesResponse] = await Promise.all([
       axios.get(`${API_BASE_URL}/channels`),
       axios.get(`${API_BASE_URL}/messages`),
-    ]);
-    
+    ])
+
     return {
       channels: channelsResponse.data,
       messages: messagesResponse.data,
-    };
-  } catch (error) {
-    const message = error.response?.data?.message || 'Ошибка загрузки данных';
-    throw new Error(message);
+    }
   }
-};
+  catch (error) {
+    const message = error.response?.data?.message || 'Ошибка загрузки данных'
+    throw new Error(message)
+  }
+}
 
 export const addMessage = async (channelId, body, username) => {
   try {
     const response = await axios.post(
       `${API_BASE_URL}/messages`,
-      { body, channelId, username }
-    );
-    return response.data;
-  } catch (error) {
-    const message = error.response?.data?.message || 'Ошибка отправки сообщения';
-    throw new Error(message);
+      { body, channelId, username },
+    )
+    return response.data
   }
-};
+  catch (error) {
+    const message = error.response?.data?.message || 'Ошибка отправки сообщения'
+    throw new Error(message)
+  }
+}
 
 export const addChannel = async (name) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/channels`, { name });
-    return response.data;
-  } catch (error) {
-    const message =
-      error.response?.data?.message || 'Ошибка создания канала';
-    throw new Error(message);
+    const response = await axios.post(`${API_BASE_URL}/channels`, { name })
+    return response.data
   }
-};
+  catch (error) {
+    const message
+      = error.response?.data?.message || 'Ошибка создания канала'
+    throw new Error(message)
+  }
+}
 
 export const deleteChannel = async (channelId) => {
   try {
-    await axios.delete(`${API_BASE_URL}/channels/${channelId}`);
-  } catch (error) {
-    const message =
-      error.response?.data?.message || 'Ошибка удаления канала';
-    throw new Error(message);
+    await axios.delete(`${API_BASE_URL}/channels/${channelId}`)
   }
-};
+  catch (error) {
+    const message
+      = error.response?.data?.message || 'Ошибка удаления канала'
+    throw new Error(message)
+  }
+}
 
 export const renameChannel = async (channelId, name) => {
   try {
     const response = await axios.patch(
       `${API_BASE_URL}/channels/${channelId}`,
-      { name }
-    );
-    return response.data;
-  } catch (error) {
-    const message =
-      error.response?.data?.message || 'Ошибка переименования канала';
-    throw new Error(message);
+      { name },
+    )
+    return response.data
   }
-};
+  catch (error) {
+    const message
+      = error.response?.data?.message || 'Ошибка переименования канала'
+    throw new Error(message)
+  }
+}

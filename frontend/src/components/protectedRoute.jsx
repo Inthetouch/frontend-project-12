@@ -1,12 +1,12 @@
-import { Navigate } from 'react-router-dom';
-import { isAuthenticated } from '../services/authService';
+import { Navigate } from 'react-router-dom'
+import { isAuthenticated } from '../services/authService'
 
 function ProtectedRoute({ element }) {
   if (!isAuthenticated()) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" replace />
   }
 
-  return element;
+  return element
 }
 
-export default ProtectedRoute;
+export default ProtectedRoute

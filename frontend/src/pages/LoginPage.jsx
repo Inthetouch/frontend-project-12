@@ -1,30 +1,30 @@
-import { useEffect, useRef, useState } from 'react';
-import { useFormik } from 'formik';
-import { Button, Form, Card, Container, Row, Col, FloatingLabel } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import * as Yup from "yup";
-import { login } from "../services/authService.js";
-import { showSuccessToast } from '../utils/toastService';
-import { setRollbarUser } from '../config/rollbar';
-import { logInfo, logError } from '../utils/errorLogger';
-import Header from '../components/Header.jsx';
-import avatarImage from '../assets/avatar_1.jpg';
+import { useEffect, useRef, useState } from 'react'
+import { useFormik } from 'formik'
+import { Button, Form, Card, Container, Row, Col, FloatingLabel } from 'react-bootstrap'
+import { Link, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import * as Yup from 'yup'
+import { login } from '../services/authService.js'
+import { showSuccessToast } from '../utils/toastService'
+import { setRollbarUser } from '../config/rollbar'
+import { logInfo, logError } from '../utils/errorLogger'
+import Header from '../components/Header.jsx'
+import avatarImage from '../assets/avatar_1.jpg'
 
 function LoginPage() {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  const inputRef = useRef(null);
-  const [authFailed, setAuthFailed] = useState(false);
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const inputRef = useRef(null)
+  const [authFailed, setAuthFailed] = useState(false)
 
   const validationSchema = Yup.object().shape({
-  username: Yup.string()
-    .trim()
-    .required(t('auth.validation.usernameRequired')),
-  password: Yup.string()
-    .trim()
-    .required(t('auth.validation.passwordRequired')),
-  });
+    username: Yup.string()
+      .trim()
+      .required(t('auth.validation.usernameRequired')),
+    password: Yup.string()
+      .trim()
+      .required(t('auth.validation.passwordRequired')),
+  })
 
   const formik = useFormik({
     initialValues: {
@@ -33,24 +33,25 @@ function LoginPage() {
     },
     validationSchema,
     onSubmit: async (values) => {
-      setAuthFailed(false);
+      setAuthFailed(false)
       try {
-        await login(values.username, values.password);
-        setRollbarUser(values.username);
-        logInfo('User logged in', { username: values.username });
-        showSuccessToast('toast.auth.loginSuccess');
-        navigate('/');
-      } catch (error) {
-        setAuthFailed(true);
-        inputRef.current?.select();
-        logError(error, { username: values.username, type: 'login_error' });
+        await login(values.username, values.password)
+        setRollbarUser(values.username)
+        logInfo('User logged in', { username: values.username })
+        showSuccessToast('toast.auth.loginSuccess')
+        navigate('/')
+      }
+      catch (error) {
+        setAuthFailed(true)
+        inputRef.current?.select()
+        logError(error, { username: values.username, type: 'login_error' })
       }
     },
-  });
+  })
 
   useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+    inputRef.current?.focus()
+  }, [])
 
   return (
     <div className="d-flex flex-column h-100 bg-light">
@@ -111,17 +112,17 @@ function LoginPage() {
                         autoComplete="current-password"
                       />
                       <Form.Control.Feedback type="invalid" tooltip>
-                        {authFailed 
-                            ? t('auth.validation.authError')
-                            : formik.errors.password}
+                        {authFailed
+                          ? t('auth.validation.authError')
+                          : formik.errors.password}
                       </Form.Control.Feedback>
                     </FloatingLabel>
 
-                    <Button 
-                        type="submit" 
-                        variant="outline-primary" 
-                        className="w-100 mb-3"
-                        disabled={formik.isSubmitting}
+                    <Button
+                      type="submit"
+                      variant="outline-primary"
+                      className="w-100 mb-3"
+                      disabled={formik.isSubmitting}
                     >
                       {t('auth.login.button')}
                     </Button>
@@ -131,7 +132,11 @@ function LoginPage() {
 
               <Card.Footer className="p-4 border-top-0 bg-light">
                 <div className="d-flex flex-column align-items-center">
-                  <span className="small mb-2">{t('auth.login.noAccount')} <Link to="/signup">{t('auth.login.signup')}</Link></span>
+                  <span className="small mb-2">
+                    {t('auth.login.noAccount')}
+                    {' '}
+                    <Link to="/signup">{t('auth.login.signup')}</Link>
+                  </span>
                 </div>
               </Card.Footer>
 
@@ -140,7 +145,7 @@ function LoginPage() {
         </Row>
       </Container>
     </div>
-  );
+  )
 };
 
-export default LoginPage;
+export default LoginPage
