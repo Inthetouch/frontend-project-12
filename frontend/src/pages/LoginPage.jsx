@@ -3,13 +3,13 @@ import { useFormik } from 'formik'
 import { Button, Form, Card, Container, Row, Col, FloatingLabel } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import * as Yup from 'yup'
 import { login } from '../services/authService.js'
 import { showSuccessToast } from '../utils/toastService'
 import { setRollbarUser } from '../config/rollbar'
 import { logInfo, logError } from '../utils/errorLogger'
 import Header from '../components/Header.jsx'
 import avatarImage from '../assets/avatar_1.jpg'
+import { getLoginSchema } from '../utils/validationSchemas'
 
 function LoginPage() {
   const { t } = useTranslation()
@@ -17,14 +17,23 @@ function LoginPage() {
   const inputRef = useRef(null)
   const [authFailed, setAuthFailed] = useState(false)
 
-  const validationSchema = Yup.object().shape({
-    username: Yup.string()
-      .trim()
-      .required(t('auth.validation.usernameRequired')),
-    password: Yup.string()
-      .trim()
-      .required(t('auth.validation.passwordRequired')),
-  })
+  const validationSchema = getLoginSchema(t)
+
+  const handleSubmit = async (values) => {
+    setAuthFailed(false)
+    try {
+      await login(values.username, values.password)
+      setRollbarUser(values.username)
+      logInfo('User logged in', { username: values.username })
+      showSuccessToast('toast.auth.loginSuccess')
+      navigate('/')
+    }
+    catch (error) {
+      setAuthFailed(true)
+      inputRef.current?.select()
+      logError(error, { username: values.username, type: 'login_error' })
+    }
+  }
 
   const formik = useFormik({
     initialValues: {
@@ -32,21 +41,7 @@ function LoginPage() {
       password: '',
     },
     validationSchema,
-    onSubmit: async (values) => {
-      setAuthFailed(false)
-      try {
-        await login(values.username, values.password)
-        setRollbarUser(values.username)
-        logInfo('User logged in', { username: values.username })
-        showSuccessToast('toast.auth.loginSuccess')
-        navigate('/')
-      }
-      catch (error) {
-        setAuthFailed(true)
-        inputRef.current?.select()
-        logError(error, { username: values.username, type: 'login_error' })
-      }
-    },
+    onSubmit: handleSubmit,
   })
 
   useEffect(() => {

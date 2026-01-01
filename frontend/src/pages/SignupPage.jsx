@@ -3,10 +3,10 @@ import { useFormik } from 'formik'
 import { Button, Form, Card, Container, Row, Col, FloatingLabel } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import * as Yup from 'yup'
 import { signup } from '../services/authService.js'
 import Header from '../components/Header'
 import { showSuccessToast, showErrorToast } from '../utils/toastService'
+import { getSignupSchema } from '../utils/validationSchemas'
 import avatarImage from '../assets/avatar_2.jpg'
 
 function SignupPage() {
@@ -15,21 +15,26 @@ function SignupPage() {
   const inputRef = useRef(null)
   const [registrationError, setRegistrationError] = useState(false)
 
-  const validationSchema = Yup.object().shape({
-    username: Yup.string()
-      .trim()
-      .required(t('auth.validation.usernameRequired'))
-      .min(3, t('auth.validation.usernameTooShort'))
-      .max(20, t('auth.validation.usernameTooLong')),
-    password: Yup.string()
-      .trim()
-      .required(t('auth.validation.passwordRequired'))
-      .min(6, t('auth.validation.passwordTooShort')),
-    confirmPassword: Yup.string()
-      .test('password-match', t('auth.validation.passwordMismatch'), function (value) {
-        return this.parent.password === value
-      }),
-  })
+  const validationSchema = getSignupSchema(t)
+
+  const handleSubmit = async (values) => {
+    setRegistrationError(false)
+    try {
+      await signup(values.username, values.password)
+      showSuccessToast(t('toast.auth.signupSuccess'))
+      navigate('/')
+    }
+    catch (err) {
+      console.error(err)
+      if (err.response && err.response.status === 409) {
+        setRegistrationError(true)
+        inputRef.current?.select()
+      }
+      else {
+        showErrorToast(t('toast.auth.signupError'))
+      }
+    }
+  }
 
   const formik = useFormik({
     initialValues: {
@@ -38,24 +43,7 @@ function SignupPage() {
       confirmPassword: '',
     },
     validationSchema,
-    onSubmit: async (values) => {
-      setRegistrationError(false)
-      try {
-        await signup(values.username, values.password)
-        showSuccessToast(t('toast.auth.signupSuccess'))
-        navigate('/')
-      }
-      catch (err) {
-        console.error(err)
-        if (err.response && err.response.status === 409) {
-          setRegistrationError(true)
-          inputRef.current?.select()
-        }
-        else {
-          showErrorToast(t('toast.auth.signupError'))
-        }
-      }
-    },
+    onSubmit: handleSubmit,
   })
 
   useEffect(() => {

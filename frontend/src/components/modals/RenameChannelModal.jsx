@@ -3,10 +3,10 @@ import { useFormik } from 'formik'
 import { Modal, Button, Form } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import * as yup from 'yup'
-import { renameChannel } from '../store/chatSlice'
-import { showSuccessToast, showErrorToast } from '../utils/toastService'
-import { cleanProfanity } from '../utils/profanityFilter'
+import { renameChannel } from '../../store/chatSlice'
+import { showSuccessToast, showErrorToast } from '../../utils/toastService'
+import { cleanProfanity } from '../../utils/profanityFilter'
+import { getChannelSchema } from '../../utils/validationSchemas'
 
 const RenameChannelModal = ({ isOpen, onClose, channel }) => {
   const { t } = useTranslation()
@@ -14,19 +14,28 @@ const RenameChannelModal = ({ isOpen, onClose, channel }) => {
   const { channels } = useSelector(state => state.chat)
   const inputRef = useRef(null)
 
-  const validationSchema = yup.object({
-    name: yup.string()
-      .trim()
-      .required(t('chat.channelModal.rename.validation.nameRequired'))
-      .min(3, t('chat.channelModal.rename.validation.nameTooShort'))
-      .max(20, t('chat.channelModal.rename.validation.nameTooLong'))
-      .test('unique', t('chat.channelModal.rename.validation.nameDuplicate'), (value) => {
-        if (!value || !channel) return true
-        return !channels.some(
-          ch => ch.name.toLowerCase() === value.toLowerCase(),
-        )
-      }),
-  })
+  const existingNames = channels.filter(c => c.id !== channel?.id).map(c => c.name)
+  const validationSchema = getChannelSchema(existingNames, t)
+
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+      const cleanedName = cleanProfanity(values.name)
+      await dispatch(
+        renameChannel({ channelId: channel.id, name: cleanedName }),
+      ).unwrap()
+
+      showSuccessToast('toast.channel.renamed')
+      onClose()
+    }
+    catch (error) {
+      console.error('Failed to rename channel:', error)
+      showErrorToast('toast.channel.renameError')
+      inputRef.current?.select()
+    }
+    finally {
+      setSubmitting(false)
+    }
+  }
 
   const formik = useFormik({
     initialValues: {
@@ -34,25 +43,7 @@ const RenameChannelModal = ({ isOpen, onClose, channel }) => {
     },
     validationSchema,
     enableReinitialize: true,
-    onSubmit: async (values, { setSubmitting }) => {
-      try {
-        const cleanedName = cleanProfanity(values.name)
-        await dispatch(
-          renameChannel({ channelId: channel.id, name: cleanedName }),
-        ).unwrap()
-
-        showSuccessToast('toast.channel.renamed')
-        onClose()
-      }
-      catch (error) {
-        console.error('Failed to rename channel:', error)
-        showErrorToast('toast.channel.renameError')
-        inputRef.current?.select()
-      }
-      finally {
-        setSubmitting(false)
-      }
-    },
+    onSubmit: handleSubmit,
   })
 
   useEffect(() => {

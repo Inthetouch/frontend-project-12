@@ -3,10 +3,10 @@ import { useFormik } from 'formik'
 import { Modal, Button, Form } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import * as Yup from 'yup'
-import { createChannel } from '../store/chatSlice'
-import { showSuccessToast, showErrorToast } from '../utils/toastService'
-import { cleanProfanity } from '../utils/profanityFilter'
+import { createChannel } from '../../store/chatSlice'
+import { showSuccessToast, showErrorToast } from '../../utils/toastService'
+import { cleanProfanity } from '../../utils/profanityFilter'
+import { getChannelSchema } from '../../utils/validationSchemas'
 
 function AddChannelModal({ isOpen, onClose }) {
   const { t } = useTranslation()
@@ -14,19 +14,27 @@ function AddChannelModal({ isOpen, onClose }) {
   const { channels } = useSelector(state => state.chat)
   const inputRef = useRef(null)
 
-  const validationSchema = Yup.object().shape({
-    name: Yup.string()
-      .trim()
-      .required(t('chat.channelModal.add.validation.nameRequired'))
-      .min(3, t('chat.channelModal.add.validation.nameTooShort'))
-      .max(20, t('chat.channelModal.add.validation.nameTooLong'))
-      .test('unique', t('chat.channelModal.add.validation.nameDuplicate'), function (value) {
-        if (!value) return true
-        return !channels.some(
-          ch => ch.name.toLowerCase() === value?.toLowerCase(),
-        )
-      }),
-  })
+  const channelNames = channels.map(c => c.name)
+  const validationSchema = getChannelSchema(channelNames, t)
+
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+    try {
+      const cleanedName = cleanProfanity(values.name)
+      await dispatch(createChannel({ name: cleanedName })).unwrap()
+
+      showSuccessToast('toast.channel.created')
+      onClose()
+      resetForm()
+    }
+    catch (error) {
+      console.error('Failed to create channel:', error)
+      showErrorToast('toast.channel.createError')
+      inputRef.current?.select()
+    }
+    finally {
+      setSubmitting(false)
+    }
+  }
 
   const formik = useFormik({
     initialValues: {
@@ -35,25 +43,7 @@ function AddChannelModal({ isOpen, onClose }) {
     validationSchema,
     validateOnBlur: false,
     validateOnChange: false,
-    onSubmit: async (values, { setSubmitting, resetForm }) => {
-      try {
-        const cleanedName = cleanProfanity(values.name)
-
-        await dispatch(createChannel({ name: cleanedName })).unwrap()
-
-        showSuccessToast('toast.channel.created')
-        onClose()
-        resetForm()
-      }
-      catch (error) {
-        console.error('Failed to create channel:', error)
-        showErrorToast('toast.channel.createError')
-        inputRef.current?.select()
-      }
-      finally {
-        setSubmitting(false)
-      }
-    },
+    onSubmit: handleSubmit,
   })
 
   useEffect(() => {

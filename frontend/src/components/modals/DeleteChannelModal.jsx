@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Modal, Button } from 'react-bootstrap'
 import { useDispatch } from 'react-redux'
-import { deleteChannel } from '../store/chatSlice'
+import { deleteChannel } from '../../store/chatSlice'
 import { useTranslation } from 'react-i18next'
-import { showSuccessToast, showErrorToast } from '../utils/toastService'
+import { showSuccessToast, showErrorToast } from '../../utils/toastService'
 
 function DeleteChannelModal({ isOpen, onClose, channel }) {
   const dispatch = useDispatch()
