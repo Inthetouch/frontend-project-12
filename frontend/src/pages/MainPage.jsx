@@ -32,9 +32,9 @@ import Header from '../components/Header'
 import ChannelList from '../components/ChannelList'
 import MessageList from '../components/MessageList'
 import MessageForm from '../components/MessageForm'
-import AddChannelModal from '../components/AddChannelModal'
-import RenameChannelModal from '../components/RenameChannelModal'
-import DeleteChannelModal from '../components/DeleteChannelModal'
+import AddChannelModal from '../components/modals/AddChannelModal'
+import RenameChannelModal from '../components/modals/RenameChannelModal'
+import DeleteChannelModal from '../components/modals/DeleteChannelModal'
 import { Container, Row, Col, Spinner } from 'react-bootstrap'
 
 const MainPage = () => {
