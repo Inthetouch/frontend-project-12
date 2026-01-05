@@ -84,7 +84,6 @@ function LoginPage() {
                         onBlur={formik.handleBlur}
                         value={formik.values.username}
                         isInvalid={authFailed || (formik.touched.username && !!formik.errors.username)}
-                        autoComplete="username"
                       />
                       <Form.Control.Feedback type="invalid" tooltip>
                         {formik.errors.username}
@@ -104,7 +103,6 @@ function LoginPage() {
                         onBlur={formik.handleBlur}
                         value={formik.values.password}
                         isInvalid={authFailed || (formik.touched.password && !!formik.errors.password)}
-                        autoComplete="current-password"
                       />
                       <Form.Control.Feedback type="invalid" tooltip>
                         {authFailed

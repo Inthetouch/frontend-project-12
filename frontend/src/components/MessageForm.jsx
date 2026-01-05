@@ -75,7 +75,6 @@ const MessageForm = () => {
           value={messageBody}
           onChange={e => setMessageBody(e.target.value)}
           disabled={isSending}
-          autoComplete="off"
         />
 
         <Button

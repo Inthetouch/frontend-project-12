@@ -7,7 +7,7 @@ const NotFoundPage = () => {
   return (
     <>
       <Header />
-      <div className="not-found-page">
+      <div className="not-found-page text-center">
         <h1>{t('notFound.title')}</h1>
         <p>{t('notFound.message')}</p>
         <p>{t('notFound.description')}</p>

@@ -88,7 +88,6 @@ function SignupPage() {
                         isInvalid={
                           (formik.touched.username && !!formik.errors.username) || registrationError
                         }
-                        autoComplete="username"
                       />
                       <Form.Control.Feedback type="invalid" tooltip placement="right">
                         {registrationError
@@ -110,7 +109,6 @@ function SignupPage() {
                         onBlur={formik.handleBlur}
                         value={formik.values.password}
                         isInvalid={formik.touched.password && !!formik.errors.password}
-                        autoComplete="new-password"
                       />
                       <Form.Control.Feedback type="invalid" tooltip>
                         {formik.errors.password}
@@ -130,7 +128,6 @@ function SignupPage() {
                         onBlur={formik.handleBlur}
                         value={formik.values.confirmPassword}
                         isInvalid={formik.touched.confirmPassword && !!formik.errors.confirmPassword}
-                        autoComplete="new-password"
                       />
                       <Form.Control.Feedback type="invalid" tooltip>
                         {formik.errors.confirmPassword}

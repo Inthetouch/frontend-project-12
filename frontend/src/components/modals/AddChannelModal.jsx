@@ -72,7 +72,6 @@ function AddChannelModal({ isOpen, onClose }) {
               value={formik.values.name}
               isInvalid={!!formik.errors.name}
               disabled={formik.isSubmitting}
-              autoComplete="off"
             />
             <Form.Control.Feedback type="invalid">
               {formik.errors.name}
